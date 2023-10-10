@@ -11,7 +11,12 @@
     <div class="main">Hi</div>
     <script>
       async function main() {
-  const res = async fetch("https://google.com")
+        const headers = [
+  ['Content-Type', 'text/html', 'extra'],
+  ['Accept'],
+];
+        
+  const res = async fetch("https://google.com/", { headers })
         console.log(JSON.stringify(res.body))
       }
     </script>
