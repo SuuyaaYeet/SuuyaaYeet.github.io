@@ -29,7 +29,7 @@
     <a href="./tierlist">Tier List</a>
     <a href="./leaderboard">Leaderboard</a>
     <a href="./player">Player Search</a>
-    <a href="https://supervive.wiki.gg">wiki.gg</a>
+    <a href="https://supervive.wiki.gg"  target="_blank">wiki.gg</a>
   </div>
 </div>
  <script type="module">
@@ -74,6 +74,7 @@
 </div>    
 </div>
  <div class="footer">
+  <div class="border"></div>
   <div class="info-container">
     <div class="info-column">
       <h3>REQUIRED GENERICS</h3>
@@ -127,12 +128,12 @@
       )
         .then((res) => res.json())
         .then((result) => result)
-        .catch((err) => err);
+        .catch((err) => console.log(err));
       let hunters = [];
       try {
         result.forEach((x) => hunters.push(x.h));
       } catch {
-        hunters.push("Myth");
+        hunters = JSON.parse(`["Ghost","Zeph","Felix","Kingpin","Shiv","Celeste","Gunner","Myth","Bishop","Brall","Elluna","Oath","Shrike","Stalker","Joule","Void"]`);
       }
       hunters.sort();
       return hunters;

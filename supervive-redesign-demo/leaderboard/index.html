@@ -29,7 +29,7 @@
     <a href="../tierlist">Tier List</a>
     <a href="../leaderboard">Leaderboard</a>
     <a href="../player">Player Search</a>
-    <a href="https://supervive.wiki.gg">wiki.gg</a>
+    <a href="https://supervive.wiki.gg"  target="_blank">wiki.gg</a>
   </div>
 </div>
  <script type="module">
@@ -47,6 +47,37 @@
     }
   });
   let hunters = await getHunters();
+  let selectionEl = document.getElementById("hunter-selection");
+  ["all", ...hunters].forEach((x) => {
+    createHunterSelectButton(x);
+  });
+
+  function createHunterSelectButton(name) {
+    let bt = document.createElement("button");
+    bt.innerText = name;
+    selectionEl.append(bt);
+    bt.onclick = () => selectHunter(name);
+  }
+  function selectHunter(name) {
+    console.log(name);
+    document.getElementById("hunter").value = name
+    if (name === "all") {
+      document.getElementById("hunter-name").innerText = "All Hunters";
+      setHunterPortrait("");
+      document.getElementById("hunter-portrait").style.display = "";
+      return;
+    }
+    document.getElementById("hunter-name").innerText = name;
+    setHunterPortrait(name);
+  }
+
+  function setHunterPortrait(name) {
+    let portraitEl = document.getElementById("hunter-portrait");
+    portraitEl.style.display = "flex";
+    let img = portraitEl.querySelector("img");
+    img.src = `https://assets.supervive.io/images/${name}.webp`;
+    img.alt = `Portrait ${name}`;
+  }
 </script>
 <div class="filter-section ranked">
   <div class="filter-selection">
@@ -148,6 +179,7 @@
   
 </div>
  <div class="footer">
+  <div class="border"></div>
   <div class="info-container">
     <div class="info-column">
       <h3>REQUIRED GENERICS</h3>
@@ -201,12 +233,12 @@
       )
         .then((res) => res.json())
         .then((result) => result)
-        .catch((err) => err);
+        .catch((err) => console.log(err));
       let hunters = [];
       try {
         result.forEach((x) => hunters.push(x.h));
       } catch {
-        hunters.push("Myth");
+        hunters = JSON.parse(`["Ghost","Zeph","Felix","Kingpin","Shiv","Celeste","Gunner","Myth","Bishop","Brall","Elluna","Oath","Shrike","Stalker","Joule","Void"]`);
       }
       hunters.sort();
       return hunters;

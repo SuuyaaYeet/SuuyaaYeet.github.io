@@ -114,12 +114,19 @@ html {
 }
 
 .footer {
-  border-top: 1px solid var(--sv-purple-light);
+  flex-grow: 1;
   padding: 2em;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-direction: column;
   gap: 1em;
+  .border {
+    height: 0px;
+    width: 100%;
+    border-top: 1px solid var(--sv-purple-light);
+  }
+
   .info-container {
     display: flex;
     justify-content: space-between;
@@ -205,7 +212,7 @@ html {
     /* flex-grow: 1; */
     /* width: 100%; */
     text-align: center;
-    font-size: 8em;
+    font-size: 6.5vw;
     font-weight: bold;
     font-style: italic;
   }
@@ -218,8 +225,8 @@ html {
   .hunter-portrait {
     display: none;
     img {
-      height: 8em;
-      width: 8em;
+      height: 8vw;
+      width: 8vw;
       border-radius: 50%;
     }
   }
