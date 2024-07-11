@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles/main.css" />
+    <link rel="stylesheet" href="../styles/selection.css" />
+    <title>Supervive.io - Tier List</title>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <script></script>
+    <div class="container">
+      <div class="components">
+        <div class="header">
+  <a class="title" href="/"
+    ><span><img src="../assets/supervive_logo_white.svg" alt="" />.io</span></a
+  >
+  <div class="links">
+    <a href="../tierlist">Tier List</a>
+    <a href="../leaderboard">Leaderboard</a>
+    <a href="../player">Player Search</a>
+    <a href="https://supervive.wiki.gg">wiki.gg</a>
+  </div>
+</div>
+ <script type="module">
+  document.title =
+    "Supervive.io - Player";
+</script>
+<div class="main">
+  <h1>PLAYER</h1>
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervive.io - Player </title>
+</head>
+<body>
+    <script>
+              let result = await fetch(
+        "https://supervive.io/api/statistics/BRSquad.json?sort=wr1&order=desc"
+      )
+        .then((res) => res.json)
+        .catch((e) => console.log(e));
+      console.log(result);
+    </script>
+</body>
+</html> 
+</div>
+ <div class="footer">
+  <div class="info-container">
+    <div class="info-column">
+      <h3>REQUIRED GENERICS</h3>
+      <p>
+        <a href="/privacy" class="text-reset">Privacy Policy</a>
+      </p>
+      <p>
+        <a href="/tos" class="text-reset">Terms of Service</a>
+      </p>
+      <p b-kamcv5kxpw="">© 2024 - shaalzuth</p>
+    </div>
+    <div class="info-column">
+      <h3>OTHER SITES</h3>
+
+      <p>
+        <a href="https://helldivers.io" class="text-reset"
+          >Helldivers Gaalactic War Status</a
+        >
+      </p>
+      <p>
+        <a href="https://d4armory.io" class="text-reset">Diablo 4 Armory</a>
+      </p>
+      <p>
+        <a href="https://warcraftrumble.gg" class="text-reset"
+          >Warcraft Rumble DB</a
+        >
+      </p>
+    </div>
+    <div class="info-column">
+      <h3>CONTACT</h3>
+      <p>shaalzuth @ gmail</p>
+      <p>eth0logy on discord</p>
+      <p><a href="/card.webp">oath image art</a> by magicologist</p>
+    </div>
+  </div>
+
+  <div class="info-text">
+    supervive.io isn't endorsed by Theorycraft Games, and aall associated
+    properties (SUPERVIVE) are trademarks or registered trademarks of
+    Theorycraft Games
+  </div>
+</div>
+
+      </div>
+    </div>
+  </body>
+  <script>
+    async function getHunters() {
+      let result = await fetch(
+        "https://supervive.io/api/statistics/BRSquad.json"
+      )
+        .then((res) => res.json())
+        .then((result) => result)
+        .catch((err) => err);
+      let hunters = [];
+      try {
+        result.forEach((x) => hunters.push(x.h));
+      } catch {
+        hunters.push("Myth");
+      }
+      hunters.sort();
+      return hunters;
+    }
+  </script>
+</html>

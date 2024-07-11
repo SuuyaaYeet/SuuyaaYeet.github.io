@@ -1,0 +1,42 @@
+.filter-selection {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    .radio-group {
+      justify-content: space-around;
+      align-items: center;
+      display: flex;
+      width: inherit;
+    }
+
+    .control-background {
+      display: none;
+      background: green;
+    }
+  }
+  input {
+    display: none;
+  }
+
+  
+  label {
+    cursor: pointer;
+    font-size: 1.3em;
+    transition: all 0.5s ease;
+  }
+
+  label:hover {
+    color: var(--sv-purple-light-complement-hover);
+  }
+
+  .radio-group > input:checked + label {
+    transition: all 0.5s ease;
+    color: var(--sv-purple-light-complement);
+  }
+}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles/main.css" />
+    <link rel="stylesheet" href="../styles/selection.css" />
+    <title>Supervive.io - Tier List</title>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <script></script>
+    <div class="container">
+      <div class="components">
+        <div class="header">
+  <a class="title" href="/"
+    ><span><img src="../assets/supervive_logo_white.svg" alt="" />.io</span></a
+  >
+  <div class="links">
+    <a href="../tierlist">Tier List</a>
+    <a href="../leaderboard">Leaderboard</a>
+    <a href="../player">Player Search</a>
+    <a href="https://supervive.wiki.gg">wiki.gg</a>
+  </div>
+</div>
+ <script type="module">
+  document.title =
+    "Supervive.io - Leaderboard";
+</script>
+<div class="main">
+  <h1>LEADERBOARD</h1>
+     <script type="module">
+  document.getElementById("queue").addEventListener("change", (e) => {
+    if (e.target === document.getElementById("queue-1")) {
+      document.getElementById("unranked").classList.add("visible");
+    } else {
+      document.getElementById("unranked").classList.remove("visible");
+    }
+  });
+  let hunters = await getHunters();
+</script>
+<div class="filter-section ranked">
+  <div class="filter-selection">
+    <form id="queue">
+      <div class="radio-group queue-radio">
+        <input type="radio" id="queue-0" value="Ranked" checked name="queue" />
+        <label for="queue-0" id="queue-label-0">Ranked</label>
+        <input type="radio" id="queue-1" value="Unranked" name="queue" />
+        <label for="queue-1" id="queue-label-1">Unranked</label>
+        <div class="control-background"></div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="unranked" id="unranked">
+  <div class="unranked-filters">
+    <div class="filter-section main">
+      <div class="hunter-select">
+        <div id="hunter-name" class="hunter-name">All Hunters</div>
+        <div id="hunter-portrait" class="hunter-portrait">
+          <img src="https://assets.supervive.io/images/.webp" alt="Portrait" />
+        </div>
+        <div id="hunter-selection" class="hunter-list"></div>
+        <input type="radio" id="hunter" value="all" checked name="mode" />
+      </div>
+    </div>
+    <div class="filter-section sub">
+      <div class="filter-selection">
+        <form id="mode">
+          <div class="radio-group mode-radio">
+            <input
+              type="radio"
+              id="mode-0"
+              value="BRSquad"
+              checked
+              name="mode"
+            />
+            <label for="mode-0" id="mode-label-0"
+              ><div class="flex-col">
+                <span>BR</span><span>Squad</span>
+              </div></label
+            >
+            <input type="radio" id="mode-1" value="BRDuos" name="mode" />
+            <label for="mode-1" id="mode-label-1"
+              ><div class="flex-col">
+                <span>BR</span><span>Duos</span>
+              </div></label
+            >
+            <input type="radio" id="mode-2" value="DM" name="mode" />
+            <label for="mode-2" id="mode-label-2">Deathmatch</label>
+            <div class="control-background"></div>
+          </div>
+        </form>
+      </div>
+      <div class="filter-selection">
+        <form id="time">
+          <div class="radio-group time-radio">
+            <input
+              type="radio"
+              id="time-0"
+              value="Weekly"
+              checked
+              name="time"
+            />
+            <label for="time-0" id="time-label-0">Weekly</label>
+            <input type="radio" id="time-1" value="Daily" name="time" />
+            <label for="time-1" id="time-label-1">Daily</label>
+            <div class="control-background"></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="filter-selection filter-section main">
+    <form id="stat">
+      <div class="radio-group stat-radio">
+        <input type="radio" id="stat-0" value="Hype" checked name="stat" />
+        <label for="stat-0" id="stat-label-0">Hype</label>
+        <input type="radio" id="stat-1" value="Wins" name="stat" />
+        <label for="stat-1" id="stat-label-1">Wins</label>
+        <input type="radio" id="stat-2" value="Kills" name="stat" />
+        <label for="stat-2" id="stat-label-2">Kills</label>
+        <input type="radio" id="stat-3" value="Damage" name="stat" />
+        <label for="stat-3" id="stat-label-3">Damage</label>
+        <input type="radio" id="stat-4" value="Healing" name="stat" />
+        <label for="stat-4" id="stat-label-4">Healing</label>
+        <div class="control-background"></div>
+      </div>
+    </form>
+  </div>
+</div>
+<div id="leaderboard" class="leaderboard">
+  <script>
+    async function generateFetchSignature() {}
+
+    async function fetchSVData(signature) {}
+  </script>
+</div>
+  
+</div>
+ <div class="footer">
+  <div class="info-container">
+    <div class="info-column">
+      <h3>REQUIRED GENERICS</h3>
+      <p>
+        <a href="/privacy" class="text-reset">Privacy Policy</a>
+      </p>
+      <p>
+        <a href="/tos" class="text-reset">Terms of Service</a>
+      </p>
+      <p b-kamcv5kxpw="">© 2024 - shaalzuth</p>
+    </div>
+    <div class="info-column">
+      <h3>OTHER SITES</h3>
+
+      <p>
+        <a href="https://helldivers.io" class="text-reset"
+          >Helldivers Gaalactic War Status</a
+        >
+      </p>
+      <p>
+        <a href="https://d4armory.io" class="text-reset">Diablo 4 Armory</a>
+      </p>
+      <p>
+        <a href="https://warcraftrumble.gg" class="text-reset"
+          >Warcraft Rumble DB</a
+        >
+      </p>
+    </div>
+    <div class="info-column">
+      <h3>CONTACT</h3>
+      <p>shaalzuth @ gmail</p>
+      <p>eth0logy on discord</p>
+      <p><a href="/card.webp">oath image art</a> by magicologist</p>
+    </div>
+  </div>
+
+  <div class="info-text">
+    supervive.io isn't endorsed by Theorycraft Games, and aall associated
+    properties (SUPERVIVE) are trademarks or registered trademarks of
+    Theorycraft Games
+  </div>
+</div>
+
+      </div>
+    </div>
+  </body>
+  <script>
+    async function getHunters() {
+      let result = await fetch(
+        "https://supervive.io/api/statistics/BRSquad.json"
+      )
+        .then((res) => res.json())
+        .then((result) => result)
+        .catch((err) => err);
+      let hunters = [];
+      try {
+        result.forEach((x) => hunters.push(x.h));
+      } catch {
+        hunters.push("Myth");
+      }
+      hunters.sort();
+      return hunters;
+    }
+  </script>
+</html>

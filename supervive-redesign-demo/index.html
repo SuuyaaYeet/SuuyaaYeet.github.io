@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles/main.css" />
+    <link rel="stylesheet" href="./styles/selection.css" />
+    <title>Supervive.io - Tier List</title>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <script></script>
+    <div class="container">
+      <div class="components">
+        <div class="header">
+  <a class="title" href="/"
+    ><span><img src="./assets/supervive_logo_white.svg" alt="" />.io</span></a
+  >
+  <div class="links">
+    <a href="./tierlist">Tier List</a>
+    <a href="./leaderboard">Leaderboard</a>
+    <a href="./player">Player Search</a>
+    <a href="https://supervive.wiki.gg">wiki.gg</a>
+  </div>
+</div>
+ <script type="module">
+  document.title =
+    "Supervive.io - Tierlist";
+</script>
+<div class="main">
+  <h1>TIERLIST</h1>
+   <div>Data based on the top 1k ranked players</div>
+<div style="text-align: start">
+  <h3>Supervive info and biased opinion</h5>
+  <p>
+    SUPERVIVE is a WASD team-based hero battle royale (that is
+    free-to-play!).
+  </p>
+  <p>
+    Like most battle royales, you land in a zone with lots of other teams, and
+    over time, the available zone shrinks as a circle of death comes in to
+    force team fights.
+  </p>
+  <p>
+    It also has a deathmatch arena mode, which I like more. I was a big fan of
+    Battlerite, and the gameplay gives you that same feeling of pixel perfect
+    hits, with the capability to 1v1 anyone with any champ, as long as you are
+    better.
+  </p>
+  <p>
+    I'm also a contributor to supervive.wiki.gg, amongst many others. General
+    info can be found there, whether it's skills, items, powers, enemies, or
+    any other questions you could have about the game.
+  </p>
+  <p>
+    Use my referral code if you want
+    <a
+      style="text-decoration: underline"
+      href="https://accounts.theorycraftgames.com/refer-a-friend?referral-code=61948ce8287a4a2ab71dde1c1fd907ea"
+      >61948ce8287a4a2ab71dde1c1fd907ea</a
+    >
+  </p>
+
+  <div class="info-text">The appearence of this site has been redesigned by Suuyaa on discord <img src="https://cdn.discordapp.com/emojis/1213269966581801032.webp" style="height: 1em;" alt="myth gooby"> . All rights go to shalzuth.</div>
+</div>    
+</div>
+ <div class="footer">
+  <div class="info-container">
+    <div class="info-column">
+      <h3>REQUIRED GENERICS</h3>
+      <p>
+        <a href="/privacy" class="text-reset">Privacy Policy</a>
+      </p>
+      <p>
+        <a href="/tos" class="text-reset">Terms of Service</a>
+      </p>
+      <p b-kamcv5kxpw="">© 2024 - shaalzuth</p>
+    </div>
+    <div class="info-column">
+      <h3>OTHER SITES</h3>
+
+      <p>
+        <a href="https://helldivers.io" class="text-reset"
+          >Helldivers Gaalactic War Status</a
+        >
+      </p>
+      <p>
+        <a href="https://d4armory.io" class="text-reset">Diablo 4 Armory</a>
+      </p>
+      <p>
+        <a href="https://warcraftrumble.gg" class="text-reset"
+          >Warcraft Rumble DB</a
+        >
+      </p>
+    </div>
+    <div class="info-column">
+      <h3>CONTACT</h3>
+      <p>shaalzuth @ gmail</p>
+      <p>eth0logy on discord</p>
+      <p><a href="/card.webp">oath image art</a> by magicologist</p>
+    </div>
+  </div>
+
+  <div class="info-text">
+    supervive.io isn't endorsed by Theorycraft Games, and aall associated
+    properties (SUPERVIVE) are trademarks or registered trademarks of
+    Theorycraft Games
+  </div>
+</div>
+
+      </div>
+    </div>
+  </body>
+  <script>
+    async function getHunters() {
+      let result = await fetch(
+        "https://supervive.io/api/statistics/BRSquad.json"
+      )
+        .then((res) => res.json())
+        .then((result) => result)
+        .catch((err) => err);
+      let hunters = [];
+      try {
+        result.forEach((x) => hunters.push(x.h));
+      } catch {
+        hunters.push("Myth");
+      }
+      hunters.sort();
+      return hunters;
+    }
+  </script>
+</html>
