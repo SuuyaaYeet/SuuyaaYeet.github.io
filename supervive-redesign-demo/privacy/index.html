@@ -314,19 +314,13 @@ Privacy Policy, please contact us.
   </body>
   <script>
     async function getHunters() {
-      let result = await fetch(
-        "https://supervive.io/api/statistics/BRSquad.json"
-      )
-        .then((res) => res.json())
-        .then((result) => result)
-        .catch((err) => console.log(err));
+      let result =
+        (await fetch("https://supervive.io/api/statistics/BRSquad.json")
+          .then((res) => res.json())
+          .then((result) => result)
+          .catch((err) => console.log(err))) || [];
       let hunters = [];
-      try {
-        result.forEach((x) => hunters.push(x.h));
-      } catch {
-        hunters = JSON.parse(`["Ghost","Zeph","Felix","Kingpin","Shiv","Celeste","Gunner","Myth","Bishop","Brall","Elluna","Oath","Shrike","Stalker","Joule","Void"]`);
-      }
-      hunters.sort();
+      result.forEach((x) => hunters.push(x.h));
       return hunters;
     }
   </script>

@@ -24,15 +24,18 @@
     display: none;
   }
 
-  
   label {
     cursor: pointer;
     font-size: 1.3em;
     transition: all 0.5s ease;
   }
 
+  .hunter-select:hover,
   label:hover {
     color: var(--sv-purple-light-complement-hover);
+    .hunter-name {
+      color: var(--sv-purple-light-complement-hover);
+    }
   }
 
   .radio-group > input:checked + label {

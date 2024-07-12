@@ -15,6 +15,13 @@
   /* user-select: none; */
 }
 
+body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .flex-col {
   display: flex;
   flex-direction: column;
@@ -100,13 +107,12 @@ html {
 }
 
 .main {
-  /* flex-grow: 1; */
+  flex-grow: 1;
   font-size: 1em;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1em;
+  justify-content: flex-start;
 
   h1 {
     font-size: 3em;
@@ -114,7 +120,6 @@ html {
 }
 
 .footer {
-  flex-grow: 1;
   padding: 2em;
   display: flex;
   align-items: center;
@@ -145,6 +150,11 @@ html {
   }
 }
 
+.ranked,
+.unranked {
+  margin-bottom: 1em;
+}
+
 .ranked {
   .queue-radio {
     gap: 1em;
@@ -154,13 +164,11 @@ html {
 .unranked {
   /* display: none; */
   flex-direction: column;
-  gap: 1em;
   width: 100%;
   align-items: center;
   justify-content: center;
   height: 0;
   opacity: 0;
-  display: flex;
   user-select: none;
   visibility: hidden;
   transition: all 0s ease;
@@ -169,6 +177,7 @@ html {
 .unranked.visible {
   visibility: visible;
   height: fit-content;
+  display: flex;
   opacity: 1;
   transition: all 1.3s;
 }
@@ -225,9 +234,101 @@ html {
   .hunter-portrait {
     display: none;
     img {
-      height: 8vw;
-      width: 8vw;
+      height: 7vw;
+      width: 7vw;
       border-radius: 50%;
     }
+  }
+}
+
+.hunter-list {
+  display: none;
+}
+
+.hunter-list.visible {
+  display: flex;
+}
+
+.leaderboard {
+  width: 100%;
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  #entries {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    .entry {
+      display: flex;
+      gap: 1em;
+      width: 100%;
+
+      .stat {
+        font-size: 1.5vw;
+
+        img {
+          width: 5vw;
+          padding: 0 0.5em 0 0.5em;
+        }
+      }
+
+      .cell {
+        flex: 1 1 0px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+
+        .playername {
+          font-size: 2em;
+          display: flex;
+          align-items: center;
+          
+          img {
+            width: 32px;
+            height: 32px;
+            margin-left: 5px;
+          }
+        }
+      }
+
+      .cell:nth-child(1) {
+        font-size: 2em;
+        justify-content: flex-end;
+      }
+
+      .cell:nth-child(3) {
+        justify-content: center;
+      }
+    }
+  }
+}
+
+#spinner:not([hidden]) {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#spinner::after {
+  content: "";
+  width: 80px;
+  height: 80px;
+  border: 2px solid white;
+  border-top: 3px solid var(--sv-purple);
+  border-radius: 100%;
+  will-change: transform;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

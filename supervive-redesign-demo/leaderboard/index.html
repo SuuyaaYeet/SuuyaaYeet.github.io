@@ -60,7 +60,7 @@
   }
   function selectHunter(name) {
     console.log(name);
-    document.getElementById("hunter").value = name
+    document.getElementById("hunter").value = name;
     if (name === "all") {
       document.getElementById("hunter-name").innerText = "All Hunters";
       setHunterPortrait("");
@@ -95,10 +95,10 @@
 <div class="unranked" id="unranked">
   <div class="unranked-filters">
     <div class="filter-section main">
-      <div class="hunter-select">
+      <div class="hunter-select" id="hunter-select">
         <div id="hunter-name" class="hunter-name">All Hunters</div>
         <div id="hunter-portrait" class="hunter-portrait">
-          <img src="https://assets.supervive.io/images/.webp" alt="Portrait" />
+          <img src="" alt="Portrait" />
         </div>
         <div id="hunter-selection" class="hunter-list"></div>
         <input type="radio" id="hunter" value="all" checked name="mode" />
@@ -170,10 +170,95 @@
   </div>
 </div>
 <div id="leaderboard" class="leaderboard">
-  <script>
-    async function generateFetchSignature() {}
+  <div hidden id="spinner"></div>
+  <div id="entries"></div>
+  <script type="module">
+    Array.from(document.querySelectorAll("input")).forEach((x) =>
+      x.addEventListener("change", (e) => getLeaderBoardData(e))
+    );
 
-    async function fetchSVData(signature) {}
+    const leaderboard = document.getElementById("leaderboard");
+    const spinner = document.getElementById("spinner");
+
+    await generateFetchSignature();
+
+    document.getElementById("hunter-select").onclick = () => openHunterSelect();
+    function openHunterSelect() {
+      let el = document.getElementById("hunter-selection");
+      el.classList.add("visible");
+
+      document.body.addEventListener("click", (e) => closeHunterSelect(e));
+    }
+
+    function closeHunterSelect(e) {
+      if (!document.getElementById("hunter-select").contains(e.target)) {
+        document.getElementById("hunter-selection").classList.remove("visible");
+      }
+    }
+    async function getLeaderBoardData(e) {
+      generateFetchSignature();
+    }
+
+    async function generateFetchSignature() {
+      let queue = document
+        .getElementById("queue")
+        .querySelector("input:checked").value;
+      let mode = document
+        .getElementById("mode")
+        .querySelector("input:checked").value;
+      let time = document
+        .getElementById("time")
+        .querySelector("input:checked").value;
+      let stat = document
+        .getElementById("stat")
+        .querySelector("input:checked").value;
+      let hunter = document.getElementById("hunter").value;
+      /** init loading spinner **/
+      spinner.removeAttribute("hidden");
+      document.getElementById("entries").innerHTML = "";
+      let entries = [];
+      if (queue.toLowerCase() === "ranked") {
+        entries = await fetchSVData("Ranked");
+      } else {
+        entries = await fetchSVData(`${mode}_${time}_${stat}_${hunter}`);
+      }
+      spinner.setAttribute("hidden", "");
+      if (entries.length) {
+        entries.forEach((x) => addEntry(x));
+      } else {
+        document.getElementById("entries").innerHTML = "No data found.";
+      }
+    }
+
+    function addEntry(entry) {
+      let el = document.getElementById("entries");
+      let newEntry = document.createElement("div");
+      newEntry.classList.add("entry");
+      newEntry.innerHTML = `
+      <div class="cell">${entry.n}.</div>
+      <div class="cell"><span class="playername">${entry.p} ${
+        [1, 2, 3].some((x) => x === entry.n)
+          ? "<img src='.../assets/ranked_icons/" + entry.n + ".png'>"
+          : ""
+      }</span></div>
+      <div class="cell stat"><img src=".../assets/ranked_icons/${entry.d.toLowerCase()}.png"><span>${
+        entry.v
+      } RP</span></div>
+      <div class="cell"></div>
+      `;
+      el.append(newEntry);
+    }
+
+    async function fetchSVData(signature) {
+      console.log(`https://supervive.io/api/leaderboard/${signature}.json`);
+      let result = await fetch(
+        `https://supervive.io/api/leaderboard/${signature}.json`
+      )
+        .then((res) => res.json())
+        .then((result) => result)
+        .catch((err) => err);
+      return result || [];
+    }
   </script>
 </div>
   
@@ -228,19 +313,13 @@
   </body>
   <script>
     async function getHunters() {
-      let result = await fetch(
-        "https://supervive.io/api/statistics/BRSquad.json"
-      )
-        .then((res) => res.json())
-        .then((result) => result)
-        .catch((err) => console.log(err));
+      let result =
+        (await fetch("https://supervive.io/api/statistics/BRSquad.json")
+          .then((res) => res.json())
+          .then((result) => result)
+          .catch((err) => console.log(err))) || [];
       let hunters = [];
-      try {
-        result.forEach((x) => hunters.push(x.h));
-      } catch {
-        hunters = JSON.parse(`["Ghost","Zeph","Felix","Kingpin","Shiv","Celeste","Gunner","Myth","Bishop","Brall","Elluna","Oath","Shrike","Stalker","Joule","Void"]`);
-      }
-      hunters.sort();
+      result.forEach((x) => hunters.push(x.h));
       return hunters;
     }
   </script>
