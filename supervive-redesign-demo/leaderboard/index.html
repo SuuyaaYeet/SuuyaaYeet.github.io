@@ -238,10 +238,10 @@
       <div class="cell">${entry.n}.</div>
       <div class="cell"><a class="playername" href="../player/${entry.p}" target="_blank">${entry.p} ${
         [1, 2, 3].some((x) => x === entry.n)
-          ? "<img src='../assets/ranked_icons/" + entry.n + ".png'>"
+          ? `<img src="../assets/ranked_icons/${entry.n}.png">`
           : ""
       }</a></div>
-      <div class="cell stat"><img src="../assets/ranked_icons/${entry.d.toLowerCase()}.png"><span>${
+      <div class="cell stat"><img title="${entry.d}" src="../assets/ranked_icons/${entry.d.toLowerCase()}.png"><span>${
         entry.v
       } RP</span></div>
       <div class="cell"></div>
