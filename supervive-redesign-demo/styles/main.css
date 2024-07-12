@@ -1,7 +1,8 @@
 :root {
-  --primary-light: #4ffeed;
-  --primary: #3bbfb2;
-  --primary-dark: #202124;
+  --primary: #f900d6;
+  --primary-complement: #a5fe8e;
+  --primary-dark: #101415;
+  --grey: #202124;
   --white: #ffffff;
   --greyLight-1: #e4ebf5;
   --greyLight-2: #c8d0e7;
@@ -11,7 +12,7 @@
   --sv-purple-light: #dfbdfa;
   --sv-purple-complement: #7df024;
   --sv-purple-light-complement: #d9fbbd;
-  --sv-purple-light-complement-hover: #e9fdd9;
+  --sv-purple-light-complement-fade: #e9fdd9;
   /* user-select: none; */
 }
 
@@ -20,6 +21,10 @@ body {
   height: 100%;
   display: flex;
   justify-content: center;
+}
+
+img {
+  -webkit-user-drag: none;
 }
 
 .flex-col {
@@ -49,7 +54,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--sv-purple-light);
+  color: var(--primary);
 }
 
 a {
@@ -59,7 +64,7 @@ a {
 html {
   box-sizing: border-box;
   overflow-y: scroll;
-  background: var(--primary-dark);
+  background: var(--dark);
   font-family: "Poppins", sans-serif;
   display: flex;
   justify-content: center;
@@ -89,7 +94,7 @@ html {
   justify-content: center;
   align-items: center;
   height: 7em;
-  border-bottom: 1px solid var(--sv-purple-light);
+  border-bottom: 1px solid var(--primary);
 
   .links {
     display: flex;
@@ -129,7 +134,7 @@ html {
   .border {
     height: 0px;
     width: 100%;
-    border-top: 1px solid var(--sv-purple-light);
+    border-top: 1px solid var(--primary);
   }
 
   .info-container {
@@ -282,15 +287,23 @@ html {
         align-items: center;
 
         .playername {
+          text-decoration: none;
+          color: white;
           font-size: 2em;
           display: flex;
           align-items: center;
-          
+          cursor: pointer;
+          transition: all 0.5s ease;
           img {
             width: 32px;
             height: 32px;
             margin-left: 5px;
           }
+        }
+
+        .playername:hover {
+          transition: all 0.5s ease;
+          color: var(--primary-complement);
         }
       }
 
