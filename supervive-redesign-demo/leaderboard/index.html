@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../styles/main.css" />
     <link rel="stylesheet" href="../styles/selection.css" />
+    <link rel="stylesheet" href="../styles/progressbar.css">
     <title>Supervive.io - Tier List</title>
 
     <link
@@ -38,55 +39,16 @@
 </script>
 <div class="main">
   <h1>LEADERBOARD</h1>
-     <script type="module">
-  document.getElementById("queue").addEventListener("change", (e) => {
-    if (e.target === document.getElementById("queue-1")) {
-      document.getElementById("unranked").classList.add("visible");
-    } else {
-      document.getElementById("unranked").classList.remove("visible");
-    }
-  });
-  let hunters = await getHunters();
-  let selectionEl = document.getElementById("hunter-selection");
-  ["all", ...hunters].forEach((x) => {
-    createHunterSelectButton(x);
-  });
-
-  function createHunterSelectButton(name) {
-    let bt = document.createElement("button");
-    bt.innerText = name;
-    selectionEl.append(bt);
-    bt.onclick = () => selectHunter(name);
-  }
-  function selectHunter(name) {
-    console.log(name);
-    document.getElementById("hunter").value = name;
-    if (name === "all") {
-      document.getElementById("hunter-name").innerText = "All Hunters";
-      setHunterPortrait("");
-      document.getElementById("hunter-portrait").style.display = "";
-      return;
-    }
-    document.getElementById("hunter-name").innerText = name;
-    setHunterPortrait(name);
-  }
-
-  function setHunterPortrait(name) {
-    let portraitEl = document.getElementById("hunter-portrait");
-    portraitEl.style.display = "flex";
-    let img = portraitEl.querySelector("img");
-    img.src = `https://assets.supervive.io/images/${name}.webp`;
-    img.alt = `Portrait ${name}`;
-  }
-</script>
-<div class="filter-section ranked">
+     <div class="filter-section ranked">
   <div class="filter-selection">
     <form id="queue">
       <div class="radio-group queue-radio">
+        <div></div>
         <input type="radio" id="queue-0" value="Ranked" checked name="queue" />
         <label for="queue-0" id="queue-label-0">Ranked</label>
         <input type="radio" id="queue-1" value="Unranked" name="queue" />
         <label for="queue-1" id="queue-label-1">Unranked</label>
+        <div></div>
         <div class="control-background"></div>
       </div>
     </form>
@@ -100,7 +62,28 @@
         <div id="hunter-portrait" class="hunter-portrait">
           <img src="" alt="Portrait" />
         </div>
-        <div id="hunter-selection" class="hunter-list"></div>
+        <div id="hunter-list" class="hunter-list">
+          <div></div>
+          <div></div>
+          <div id="close-hunter-list">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+            >
+              <g id="Menu / Close_LG">
+                <path
+                  id="Vector"
+                  d="M21 21L12 12M12 12L3 3M12 12L21.0001 3M12 12L3 21.0001"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </g>
+            </svg>
+          </div>
+        </div>
         <input type="radio" id="hunter" value="all" checked name="mode" />
       </div>
     </div>
@@ -127,7 +110,7 @@
               </div></label
             >
             <input type="radio" id="mode-2" value="DM" name="mode" />
-            <label for="mode-2" id="mode-label-2">Deathmatch</label>
+            <label for="mode-2" id="mode-label-2">DM</label>
             <div class="control-background"></div>
           </div>
         </form>
@@ -151,7 +134,7 @@
       </div>
     </div>
   </div>
-  <div class="filter-selection filter-section main">
+  <div class="filter-selection filter-section">
     <form id="stat">
       <div class="radio-group stat-radio">
         <input type="radio" id="stat-0" value="Hype" checked name="stat" />
@@ -172,95 +155,175 @@
 <div id="leaderboard" class="leaderboard">
   <div hidden id="spinner"></div>
   <div id="entries"></div>
-  <script type="module">
-    Array.from(document.querySelectorAll("input")).forEach((x) =>
-      x.addEventListener("change", (e) => getLeaderBoardData(e))
-    );
-
-    const leaderboard = document.getElementById("leaderboard");
-    const spinner = document.getElementById("spinner");
-
-    await generateFetchSignature();
-
-    document.getElementById("hunter-select").onclick = () => openHunterSelect();
-    function openHunterSelect() {
-      let el = document.getElementById("hunter-selection");
-      el.classList.add("visible");
-
-      document.body.addEventListener("click", (e) => closeHunterSelect(e));
-    }
-
-    function closeHunterSelect(e) {
-      if (!document.getElementById("hunter-select").contains(e.target)) {
-        document.getElementById("hunter-selection").classList.remove("visible");
-      }
-    }
-    async function getLeaderBoardData(e) {
-      generateFetchSignature();
-    }
-
-    async function generateFetchSignature() {
-      let queue = document
-        .getElementById("queue")
-        .querySelector("input:checked").value;
-      let mode = document
-        .getElementById("mode")
-        .querySelector("input:checked").value;
-      let time = document
-        .getElementById("time")
-        .querySelector("input:checked").value;
-      let stat = document
-        .getElementById("stat")
-        .querySelector("input:checked").value;
-      let hunter = document.getElementById("hunter").value;
-      /** init loading spinner **/
-      spinner.removeAttribute("hidden");
-      document.getElementById("entries").innerHTML = "";
-      let entries = [];
-      if (queue.toLowerCase() === "ranked") {
-        entries = await fetchSVData("Ranked");
-      } else {
-        entries = await fetchSVData(`${mode}_${time}_${stat}_${hunter}`);
-      }
-      spinner.setAttribute("hidden", "");
-      if (entries.length) {
-        entries.forEach((x) => addEntry(x));
-      } else {
-        document.getElementById("entries").innerHTML = "<br>No data found.<br><br><img src='https://cdn.discordapp.com/emojis/1128037371594686544.webp?size=96&quality=lossless' alt='Elluna cry emote'>";
-      }
-    }
-
-    function addEntry(entry) {
-      let el = document.getElementById("entries");
-      let newEntry = document.createElement("div");
-      newEntry.classList.add("entry");
-      newEntry.innerHTML = `
-      <div class="cell">${entry.n}.</div>
-      <div class="cell"><a class="playername" href="../player/${entry.p}" target="_blank">${entry.p} ${
-        [1, 2, 3].some((x) => x === entry.n)
-          ? `<img src="../assets/ranked_icons/${entry.n}.png">`
-          : ""
-      }</a></div>
-      <div class="cell stat"><img title="${entry.d}" src="../assets/ranked_icons/${entry.d.toLowerCase()}.png"><span>${
-        entry.v
-      } RP</span></div>
-      <div class="cell"></div>
-      `;
-      el.append(newEntry);
-    }
-
-    async function fetchSVData(signature) {
-      console.log(`https://supervive.io/api/leaderboard/${signature}.json`);
-      let result = await fetch(
-        `https://supervive.io/api/leaderboard/${signature}.json`
-      )
-        .then((res) => res.json())
-        .then((result) => result)
-        .catch((err) => err);
-      return result || [];
-    }
-  </script>
 </div>
+
+<script type="module">
+  let fetchController = new AbortController();
+  let signal;
+  Array.from(document.querySelectorAll("input")).forEach((x) =>
+    x.addEventListener("change", (e) => getLeaderBoardData(e))
+  );
+  document.getElementById("queue").addEventListener("change", (e) => {
+    if (e.target === document.getElementById("queue-1")) {
+      document.getElementById("unranked").classList.add("visible");
+    } else {
+      document.getElementById("unranked").classList.remove("visible");
+    }
+  });
+
+  let urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("queue") === "unranked") {
+    document.getElementById("queue-1").click();
+  }
+
+  const leaderboard = document.getElementById("leaderboard");
+  const spinner = document.getElementById("spinner");
+
+  await generateFetchSignature();
+
+  document.getElementById("hunter-select").onclick = (e) => openHunterSelect(e);
+  document.getElementById("close-hunter-list").onclick = (e) =>
+    closeHunterSelect(e);
+
+  let hunters = await getHunters();
+  let selectionEl = document.getElementById("hunter-list");
+  ["all", ...hunters].sort().forEach((x) => {
+    createHunterSelectButton(x);
+  });
+
+  function createHunterSelectButton(name) {
+    let bt = document.createElement("div");
+    bt.classList = "hunter-button";
+    bt.innerHTML = `
+  <img src="https://assets.supervive.io/images/${name}.webp" alt="Hunter portrait">
+  <div>${name}</div> 
+  `;
+    bt.onclick = () => selectHunter(name);
+
+    if (name === "all") {
+      bt.innerText = "All Hunters";
+      selectionEl.children[0].append(bt);
+      return;
+    }
+    selectionEl.children[1].append(bt);
+  }
+  function selectHunter(name) {
+    document.getElementById("hunter").value = name;
+    if (name === "all") {
+      document.getElementById("hunter-name").innerText = "All Hunters";
+      setHunterPortrait("");
+      document.getElementById("hunter-portrait").style.display = "";
+      return;
+    }
+    document.getElementById("hunter-name").innerText = name;
+    setHunterPortrait(name);
+    generateFetchSignature();
+  }
+
+  function setHunterPortrait(name) {
+    let portraitEl = document.getElementById("hunter-portrait");
+    portraitEl.style.display = "flex";
+    let img = portraitEl.querySelector("img");
+    img.src = `https://assets.supervive.io/images/${name}.webp`;
+    img.alt = `Portrait ${name}`;
+  }
+
+  function openHunterSelect(e) {
+    e.stopPropagation();
+    let el = document.getElementById("hunter-list");
+    if (el.classList.contains("visible") && !el.contains(e.target)) {
+      el.classList.remove("visible");
+      return;
+    } else {
+      el.classList.add("visible");
+    }
+
+    document.body.addEventListener("click", closeHunterSelect);
+  }
+
+  function closeHunterSelect(e) {
+    e.stopPropagation();
+    if (
+      e.target !== document.getElementById("hunter-list") ||
+      e.target === document.getElementById("close-hunter-list")
+    ) {
+      document.getElementById("hunter-list").classList.remove("visible");
+      document.body.removeEventListener("click", closeHunterSelect);
+    }
+  }
+  async function getLeaderBoardData(e) {
+    fetchController.abort()
+    fetchController = new AbortController();
+    signal = fetchController.signal;
+    generateFetchSignature();
+  }
+
+  async function generateFetchSignature() {
+    let queue = document
+      .getElementById("queue")
+      .querySelector("input:checked").value;
+    let mode = document
+      .getElementById("mode")
+      .querySelector("input:checked").value;
+    let time = document
+      .getElementById("time")
+      .querySelector("input:checked").value;
+    let stat = document
+      .getElementById("stat")
+      .querySelector("input:checked").value;
+    let hunter = document.getElementById("hunter").value;
+    /** init loading spinner **/
+    spinner.removeAttribute("hidden");
+    document.getElementById("entries").innerHTML = "";
+    let entries = [];
+    if (queue.toLowerCase() === "ranked") {
+      entries = await fetchSVData("Ranked");
+    } else {
+      entries = await fetchSVData(`${mode}_${time}_${stat}_${hunter}`);
+    }
+    spinner.setAttribute("hidden", "");
+    if (entries.length) {
+      entries.forEach((x) => addEntry(x));
+    } else {
+      document.getElementById("entries").innerHTML =
+        "<br>No data found.<br><br><img src='https://cdn.discordapp.com/emojis/1128037371594686544.webp?size=96&quality=lossless' alt='Elluna cry emote'>";
+    }
+  }
+
+  function addEntry(entry) {
+    let el = document.getElementById("entries");
+    let newEntry = document.createElement("div");
+    newEntry.classList.add("entry");
+    newEntry.innerHTML = `
+    <div class="cell">${entry.n}.</div>
+    <div class="cell"><a class="playername" href="../player/${
+      entry.p
+    }" target="_blank">${entry.p} ${
+      [1, 2, 3].some((x) => x === entry.n)
+        ? `<img src="../assets/ranked_icons/${entry.n}.png">`
+        : ""
+    }</a></div>
+    <div class="cell stat"><img title="${
+      entry.d
+    }" src="../assets/ranked_icons/${entry.d.toLowerCase()}.png"><span>${
+      entry.v
+    } RP</span></div>
+    <div class="cell"></div>
+    `;
+    el.append(newEntry);
+  }
+
+  async function fetchSVData(signature) {
+    let result = await fetch(
+      `https://supervive.io/api/leaderboard/${signature}.json`,
+      { signal }
+    )
+      .then((res) => res.json())
+      .then((result) => result)
+      .catch((err) => err);
+    return result || [];
+  }
+</script>
   
 </div>
  <div class="footer">

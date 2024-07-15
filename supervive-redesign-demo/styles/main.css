@@ -1,13 +1,15 @@
 :root {
-  --primary: #f900d6;
+  /* --primary: #f900d6; */
+  --primary: var(--sv-purple);
   --primary-complement: #a5fe8e;
   --primary-dark: #101415;
-  --grey: #202124;
+  --grey: #292a2d;
   --white: #ffffff;
   --greyLight-1: #e4ebf5;
   --greyLight-2: #c8d0e7;
   --greyLight-3: #bec8e4;
   --greyDark: #9baacf;
+  --sv-pink: #f900d6;
   --sv-purple: #9724f0;
   --sv-purple-light: #dfbdfa;
   --sv-purple-complement: #7df024;
@@ -64,7 +66,7 @@ a {
 html {
   box-sizing: border-box;
   overflow-y: scroll;
-  background: var(--dark);
+  background: var(--primary-dark);
   font-family: "Poppins", sans-serif;
   display: flex;
   justify-content: center;
@@ -93,13 +95,15 @@ html {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 7em;
   border-bottom: 1px solid var(--primary);
 
   .links {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 0.5em;
     font-size: 1.2em;
+    margin-bottom: 0.5em;
   }
   .title {
     font-size: 2.5em;
@@ -158,18 +162,12 @@ html {
 .ranked,
 .unranked {
   margin-bottom: 1em;
-}
-
-.ranked {
-  .queue-radio {
-    gap: 1em;
-  }
+  width: 100%;
 }
 
 .unranked {
   /* display: none; */
   flex-direction: column;
-  width: 100%;
   align-items: center;
   justify-content: center;
   height: 0;
@@ -198,7 +196,8 @@ html {
 .filter-section {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 3em;
+  width: 100%;
 }
 
 .filter-section.main {
@@ -233,7 +232,105 @@ html {
 
   .hunter-list {
     position: absolute;
-    height: 0;
+    top: 100%;
+    z-index: 100;
+    border-radius: 2em;
+    width: 100%;
+    background: var(--primary-dark);
+    box-shadow: inset 0.1rem 0.1rem 0.3rem var(--grey),
+      inset -0.1rem -0.1rem 0.3rem black;
+    /* height: 0; */
+    padding: 1em;
+    flex-direction: column;
+    display: none;
+    gap: 1em;
+    animation: appear 3s ease;
+    cursor: default;
+
+    #close-hunter-list {
+      position: absolute;
+      right: 1em;
+      top: 1em;
+      transition: all 0.5s ease;
+      cursor: pointer;
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      path {
+        stroke: white;
+      }
+    }
+
+    #close-hunter-list:hover {
+      path {
+        stroke: var(--primary-complement);
+      }
+    }
+
+    div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 1em;
+    }
+
+    div:first-child {
+      justify-content: center;
+    }
+
+    .hunter-button {
+      flex: 1 1 0px;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: flex-start;
+      border-radius: 3px;
+      cursor: pointer;
+      * {
+        transition: all 0.5s ease;
+      }
+      img {
+        width: 32px;
+        border-radius: 50%;
+      }
+    }
+
+    .hunter-button:hover {
+      * {
+        color: var(--sv-purple-light-complement);
+      }
+    }
+
+    .hunter-button:active {
+      * {
+        color: var(--primary-complement);
+      }
+    }
+
+    /* div:nth-child(2) > .hunter-button:hover {
+      color: var(--primary-complement);
+    } */
+  }
+
+  .hunter-list.visible {
+    animation: appear 3s ease;
+    display: flex;
+  }
+
+  @keyframes appear {
+    0% {
+      height: 0;
+      opacity: 0;
+    }
+
+    100% {
+      height: fit-content;
+      opacity: 1;
+    }
   }
 
   .hunter-portrait {
@@ -244,14 +341,6 @@ html {
       border-radius: 50%;
     }
   }
-}
-
-.hunter-list {
-  display: none;
-}
-
-.hunter-list.visible {
-  display: flex;
 }
 
 .leaderboard {
@@ -272,10 +361,10 @@ html {
       width: 100%;
 
       .stat {
-        font-size: 1.5vw;
+        font-size: 1.5em;
 
         img {
-          width: 5vw;
+          width: 4em;
           padding: 0 0.5em 0 0.5em;
         }
       }
@@ -285,20 +374,20 @@ html {
         display: flex;
         justify-content: flex-start;
         align-items: center;
+      }
 
-        .playername {
-          text-decoration: none;
-          color: white;
-          font-size: 2em;
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-          transition: all 0.5s ease;
-          img {
-            width: 32px;
-            height: 32px;
-            margin-left: 5px;
-          }
+      .playername {
+        text-decoration: none;
+        color: white;
+        font-size: 2em;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.5s ease;
+        img {
+          width: 32px;
+          height: 32px;
+          margin-left: 5px;
         }
 
         .playername:hover {
@@ -343,5 +432,129 @@ html {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media screen and (max-width: 1600px) {
+  .unranked-filters,
+  .ranked {
+    margin-bottom: 2em;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .container {
+    width: 100vw;
+    max-width: 100vw;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .leaderboard {
+    .stat {
+      font-size: 1.2em;
+
+      img {
+        width: 3em;
+      }
+    }
+
+    .playername {
+      font-size: 1.5em;
+    }
+  }
+}
+
+.tierlist {
+  margin: 1em 0 1em 0;
+  width: 100%;
+  flex-grow: 1;
+  justify-content: start;
+  gap: 1em;
+
+  .filter-selection {
+    font-weight: bold;
+  }
+
+  #entries {
+    gap: 1em;
+    width: 100%;
+    > * {
+      flex: 1 1 0px;
+    }
+    .entry {
+      display: flex;
+      gap: 1em;
+      padding: 1em;
+      align-items: center;
+      width: 100%;
+
+      .kd,
+      .wr,
+      .pr {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      > :first-child {
+        display: flex;
+        font-size: 2em;
+        align-items: end;
+        justify-content: end;
+      }
+
+      .kd {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        :first-child {
+          font-size: 18px;
+          font-weight: bold;
+        }
+
+        * {
+          flex: 1 1 0px;
+          display: flex;
+          flex-direction: column;
+          /* flex-grow: 3; */
+          justify-content: flex-end;
+        }
+      
+      }
+
+      .ring {
+        height: 4em;
+        width: 4em;
+        max-height: 4em;
+      }
+      > * {
+        flex: 1 1 0px;
+      }
+
+      > :last-child {
+        align-items: start;
+        flex-grow: 2;
+      }
+
+      .title {
+        display: flex;
+        flex-shrink: 0;
+        gap: 0.5em;
+        font-size: 2em;
+        font-weight: bold;
+        font-style: italic;
+        align-items: center;
+        justify-content: start;
+
+        img {
+          height: 1.5em;
+          width: 1.5em;
+          border-radius: 50%;
+        }
+      }
+    }
   }
 }
