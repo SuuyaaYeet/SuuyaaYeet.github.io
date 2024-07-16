@@ -40,196 +40,6 @@
 <div class="main">
   <h1>TIERLIST</h1>
    <div>Data based on the top 1k ranked players</div>
-<script type="module">
-  Array.from(document.querySelectorAll("input")).forEach((x) =>
-    x.addEventListener("change", (e) => showData())
-  );
-  let urlParams = new URLSearchParams(window.location.search);
-  let tierlistData;
-
-  switch ((urlParams.get("mode") || "").toLowerCase()) {
-    case "brsquad":
-      document.getElementById("mode-0").click();
-      break;
-    case "brduos":
-      document.getElementById("mode-1").click();
-      break;
-    case "dm":
-      document.getElementById("mode-2").click();
-      break;
-
-    default:
-      break;
-  }
-
-  showData();
-
-  async function showData() {
-    let entriesEl = document.getElementById("entries");
-    entriesEl.innerHTML = "";
-    const spinner = document.getElementById("spinner");
-    /** init loading spinner **/
-    spinner.removeAttribute("hidden");
-    tierlistData = await fetchTierlist();
-    spinner.setAttribute("hidden", "");
-    drawList(tierlistData);
-  }
-
-  async function fetchTierlist() {
-    let mode = document
-      .getElementById("mode")
-      .querySelector("input:checked").value;
-
-    let data = await fetch(`https://supervive.io/api/statistics/${mode}.json`)
-      .then((res) => res.json())
-      .then((res) => res)
-      .catch((err) => console.log(err));
-    data = data.sort((a, b) => a.h.localeCompare(b.h));
-    return data;
-  }
-
-  async function drawList(list) {
-    let style =
-      document.getElementById("progress-anim-styles") ||
-      document.createElement("style");
-    document.head.append(style);
-    style.id = "progress-anim-styles";
-    style.type = "text/css";
-    style.innerHTML = "";
-    list.forEach((x, index) => {
-      let entry = document.createElement("div");
-      entry.classList.add("entry");
-      entry.innerHTML = `
-        <div><span>${index + 1}.</span></div>
-        <div class="title">
-          <img src="https://assets.supervive.io/images/${
-            x.h
-          }.webp" alt="Hunter portrait">${x.h}
-        </div>
-        <div class="kd">
-          <span>${Math.round(x.kd * 100) / 100}</span>
-            <span>Avg. K/D</span>
-          </div>
-        <div class="wr">
-          <svg
-              class="ring"
-              viewBox="0 0 60 60"
-              height="60"
-              width="60"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                class="ring-track"
-                cx="30"
-                cy="30"
-                r="26"3
-                fill="none"
-                stroke="#7f7f7f"
-                stroke-width="8"
-              />
-              <circle
-                class="ring-stroke"
-                style="animation-name: ring-anim-wr-${index}"
-                cx="30"
-                cy="30"
-                r="26"
-                fill="none"
-                stroke="#000"
-                stroke-linecap="round"
-                stroke-width="8"
-                stroke-dasharray="163.36 163.36"
-                stroke-dashoffset="${2 * Math.PI * 26 * (1 - x.wr1.v)}"
-                transform="rotate(-90,30,30)"
-              />
-              <text style="font: bold 18px sans-serif; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
-                Math.round(x.wr1.v * 10000) / 100
-              }%</text>
-            </svg>
-          <span>Winrate</span></div>
-        <div class="pr">
-          <svg
-              class="ring"
-              viewBox="0 0 60 60"
-              height="60"
-              width="60"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                class="ring-track"
-                cx="30"
-                cy="30"
-                r="26"3
-                fill="none"
-                stroke="#7f7f7f"
-                stroke-width="8"
-              />
-              <circle
-                class="ring-stroke"
-                style="animation-name: ring-anim-pr-${index}"
-                cx="30"
-                cy="30"
-                r="26"
-                fill="none"
-                stroke="#000"
-                stroke-linecap="round"
-                stroke-width="8"
-                stroke-dasharray="163.36 163.36"
-                stroke-dashoffset="${
-                  2 *
-                  Math.PI *
-                  26 *
-                  (1 -
-                    x.pr.v *
-                      (document
-                        .getElementById("mode")
-                        .querySelector("input:checked")
-                        .value.toLowerCase() === "brduos"
-                        ? 2
-                        : 4))
-                }"
-                transform="rotate(-90,30,30)"
-              />
-              <text style="font: bold 18px sans-serif; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
-                Math.round(x.pr.v * 10000) / 100
-              }%</text>
-            </svg>
-          <span>Pickrate</span></div>
-        `;
-      let keyframes = `
-        @keyframes ring-anim-wr-${index} {
-          from {
-            stroke-dashoffset: 163.36;
-          }
-          to {
-            stroke-dashoffset: ${2 * Math.PI * 26 * (1 - x.wr1.v)};
-          }
-        }
-        @keyframes ring-anim-pr-${index} {
-          from {
-            stroke-dashoffset: 163.36;
-          }
-          to {
-            stroke-dashoffset: ${
-              2 *
-              Math.PI *
-              26 *
-              (1 -
-                x.pr.v *
-                  (document
-                    .getElementById("mode")
-                    .querySelector("input:checked")
-                    .value.toLowerCase() === "brduos"
-                    ? 2
-                    : 4))
-            };
-          }
-        }
-        `;
-      style.innerHTML += keyframes;
-      document.getElementById("entries").append(entry);
-    });
-  }
-</script>
 <div class="tierlist flex-col">
   <svg class="progress_gradients" hidden>
     <defs>
@@ -251,6 +61,20 @@
         <div class="control-background"></div>
       </div>
     </form>
+  </div>
+  <div class="flex-row tierlist-sort">
+    <div><span>Sort by:</span></div>
+    <div class="sort-name" data-sort>
+      <span data-sort-key="name">Hunter name</span>
+    </div>
+    <div class="sort-kd" data-sort>
+      <span data-sort-key="kd">Kill/Death</span>
+    </div>
+    <div class="sort-wr" data-sort="desc"><span data-sort-key="wr">Winrate</span></div>
+    <div class="sort-pr" data-sort>
+      <span data-sort-key="pr">Pickrate</span>
+    </div>
+    <div></div>
   </div>
   <div hidden id="spinner"></div>
   <div id="entries" class="flex-col"></div>
@@ -296,6 +120,259 @@
     . All rights go to shalzuth.
   </div>
 </div>
+
+<script type="module">
+  Array.from(document.querySelectorAll("input")).forEach((x) =>
+    x.addEventListener("change", (e) => {
+      resetSortOrder()
+      document.querySelector(".sort-wr").dataset.sort = ("desc")
+      showData()
+    })
+  );
+  let urlParams = new URLSearchParams(window.location.search);
+  let tierlistData;
+
+  switch ((urlParams.get("mode") || "").toLowerCase()) {
+    case "brsquad":
+      document.getElementById("mode-0").click();
+      break;
+    case "brduos":
+      document.getElementById("mode-1").click();
+      break;
+    case "dm":
+      document.getElementById("mode-2").click();
+      break;
+
+    default:
+      break;
+  }
+
+  Array.from(document.querySelectorAll("[data-sort] > span")).forEach((x) => {
+    x.addEventListener("click", (e) => sortData(e));
+  });
+
+  showData();
+
+  function sortData(e) {
+    let key = e.target.dataset.sortKey;
+    let sortEl = e.target.parentElement;
+    resetSortOrder(sortEl);
+    if (sortEl.dataset.sort !== "desc") {
+      sortEl.dataset.sort = "desc";
+    } else {
+      sortEl.dataset.sort = "asc";
+    }
+
+    // sort tierlistData
+    switch (key) {
+      case "name":
+        sortEl.dataset.sort === "asc"
+          ? tierlistData.sort((a, b) => a.h.localeCompare(b.h))
+          : tierlistData.sort((a, b) => b.h.localeCompare(a.h));
+        break;
+      case "kd":
+        sortEl.dataset.sort === "asc"
+          ? tierlistData.sort((a, b) => a.kd - b.kd)
+          : tierlistData.sort((a, b) => b.kd - a.kd);
+        break;
+      case "pr":
+        sortEl.dataset.sort === "asc"
+          ? tierlistData.sort((a, b) => a.pr.v - b.pr.v)
+          : tierlistData.sort((a, b) => b.pr.v - a.pr.v);
+        break;
+      case "wr":
+        sortEl.dataset.sort === "asc"
+          ? tierlistData.sort((a, b) => a.wr1.v - b.wr1.v)
+          : tierlistData.sort((a, b) => b.wr1.v - a.wr1.v);
+      default:
+        break;
+    }
+    drawList(tierlistData);
+  }
+
+  function resetSortOrder(sortEl = document.createElement("div")) {
+    Array.from(document.querySelectorAll("[data-sort]")).forEach((x) => {
+      if (x !== sortEl) x.dataset.sort = "";
+    });
+  }
+
+  async function showData() {
+    let entriesEl = document.getElementById("entries");
+    entriesEl.innerHTML = "";
+    const spinner = document.getElementById("spinner");
+    /** init loading spinner **/
+    spinner.removeAttribute("hidden");
+    tierlistData = await fetchTierlist();
+    spinner.setAttribute("hidden", "");
+    drawList(tierlistData);
+  }
+
+  async function fetchTierlist() {
+    let mode = document
+      .getElementById("mode")
+      .querySelector("input:checked").value;
+
+    let data = await fetch(`https://supervive.io/api/statistics/${mode}.json`)
+      .then((res) => res.json())
+      .then((res) => res)
+      .catch((err) => console.log(err));
+    data.sort((a, b) => b.wr1.v - a.wr1.v);
+    return data;
+  }
+
+  async function drawList(list) {
+    let entries = document.getElementById("entries");
+    entries.innerHTML = "";
+    let style =
+      document.getElementById("progress-anim-styles") ||
+      document.createElement("style");
+    document.head.append(style);
+    style.id = "progress-anim-styles";
+    style.type = "text/css";
+    style.innerHTML = "";
+    list.forEach((x, index) => {
+      let entry = document.createElement("div");
+      !(index % 2)
+        ? entry.classList.add("entry", "neumorphic")
+        : entry.classList.add("entry", "neumorphic");
+      entry.innerHTML = `
+        <div><span>${index + 1}.</span></div>
+        <a class="title" href="https://supervive.wiki.gg/wiki/${
+          x.h
+        }" target="_blank">
+          <img src="https://assets.supervive.io/images/${
+            x.h
+          }.webp" alt="Hunter portrait">${x.h}
+        </a>
+        <div class="kd">
+          <div class="flex-col">
+            <span>${Math.round(x.kd * 100) / 100}</span>
+            <span>Avg. K/D</span>
+          </div>
+        </div>
+        <div class="wr" title="Winrate: ${Math.round(x.wr1.v * 10000) / 100}%">
+          <svg
+              class="ring"
+              viewBox="0 0 60 60"
+              height="60"
+              width="60"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                class="ring-track"
+                cx="30"
+                cy="30"
+                r="26"3
+                fill="none"
+                stroke="#7f7f7f"
+                stroke-width="8"
+              />
+              <circle
+                class="ring-stroke"
+                style="animation-name: ring-anim-wr-${index}"
+                cx="30"
+                cy="30"
+                r="26"
+                fill="none"
+                stroke="#000"
+                stroke-linecap="round"
+                stroke-width="8"
+                stroke-dasharray="163.36 163.36"
+                stroke-dashoffset="${
+                  2 * Math.PI * 26 * (1 - x.wr1.v ** (1 / 4))
+                }"
+                transform="rotate(-90,30,30)"
+              />
+              <text style="font: bold 12px poppins; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
+                Math.round(x.wr1.v * 10000) / 100
+              }%</text>
+            </svg>
+          <span>Winrate</span></div>
+        <div class="pr" title="Pickrate: ${Math.round(x.pr.v * 10000) / 100}%">
+          <svg
+              class="ring"
+              viewBox="0 0 60 60"
+              height="60"
+              width="60"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                class="ring-track"
+                cx="30"
+                cy="30"
+                r="26"3
+                fill="none"
+                stroke="#7f7f7f"
+                stroke-width="8"
+              />
+              <circle
+                class="ring-stroke"
+                style="animation-name: ring-anim-pr-${index}"
+                cx="30"
+                cy="30"
+                r="26"
+                fill="none"
+                stroke="#000"
+                stroke-linecap="round"
+                stroke-width="8"
+                stroke-dasharray="163.36 163.36"
+                stroke-dashoffset="${
+                  2 *
+                  Math.PI *
+                  26 *
+                  (1 -
+                    x.pr.v *
+                      (document
+                        .getElementById("mode")
+                        .querySelector("input:checked")
+                        .value.toLowerCase() === "brduos"
+                        ? 2
+                        : 4))
+                }"
+                transform="rotate(-90,30,30)"
+              />
+              <text style="font: bold 12px poppins; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
+                Math.round(x.pr.v * 10000) / 100
+              }%</text>
+            </svg>
+          <span>Pickrate</span></div>
+          <div></div>
+        `;
+      let keyframes = `
+        @keyframes ring-anim-wr-${index} {
+          from {
+            stroke-dashoffset: 163.36;
+          }
+          to {
+            stroke-dashoffset: ${2 * Math.PI * 26 * (1 - x.wr1.v ** (1 / 4))};
+          }
+        }
+        @keyframes ring-anim-pr-${index} {
+          from {
+            stroke-dashoffset: 163.36;
+          }
+          to {
+            stroke-dashoffset: ${
+              2 *
+              Math.PI *
+              26 *
+              (1 -
+                x.pr.v *
+                  (document
+                    .getElementById("mode")
+                    .querySelector("input:checked")
+                    .value.toLowerCase() === "brduos"
+                    ? 2
+                    : 4))
+            };
+          }
+        }
+        `;
+      style.innerHTML += keyframes;
+      entries.append(entry);
+    });
+  }
+</script>
     
 </div>
  <div class="footer">
