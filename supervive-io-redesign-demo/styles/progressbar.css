@@ -23,7 +23,7 @@
   animation-duration: 0.6s;
   animation-timing-function: ease-out;
   stroke: url("#ring");
-  /* animation-name: mins; */
+  /* animation-name: fill-ring; */
 }
 .ring-stroke[data-strokefill] {
   stroke-dashoffset: attr(data-strokefill);
@@ -33,27 +33,12 @@
   stroke: var(--grey);
 }
 
-.ring-fill {
-  stroke: url("#ring");
-  animation-duration: 0.3s;
-  animation-delay: 1s;
-  animation-fill-mode: forwards;
-  animation-name: ringFill;
-  animation-timing-function: ease-in;
+.ring-highest-entry {
+  stroke: url("#ring-highest-entry");
 }
 
 /* Animations */
-@keyframes ringFill {
-  from {
-    r: 82px;
-    stroke-width: 16;
-  }
-  to {
-    r: 45px;
-    stroke-width: 90;
-  }
-}
-/* @keyframes mins {
+/* @keyframes fill-ring {
   from {
     stroke-dashoffset: 163.36;
   }

@@ -41,14 +41,6 @@
   <h1>TIERLIST</h1>
    <div>Data based on the top 1k ranked players</div>
 <div class="tierlist flex-col">
-  <svg class="progress_gradients" hidden>
-    <defs>
-      <linearGradient id="ring" x1="1" y1="0" x2="0" y2="1">
-        <stop offset="25%" stop-color="var(--sv-purple)" />
-        <stop offset="150%" stop-color="var(--sv-pink)" />
-      </linearGradient>
-    </defs>
-  </svg>
   <div class="filter-selection">
     <form id="mode">
       <div class="radio-group mode-radio">
@@ -70,7 +62,9 @@
     <div class="sort-kd" data-sort>
       <span data-sort-key="kd">Kill/Death</span>
     </div>
-    <div class="sort-wr" data-sort="desc"><span data-sort-key="wr">Winrate</span></div>
+    <div class="sort-wr" data-sort="desc">
+      <span data-sort-key="wr">Winrate</span>
+    </div>
     <div class="sort-pr" data-sort>
       <span data-sort-key="pr">Pickrate</span>
     </div>
@@ -120,17 +114,36 @@
     . All rights go to shalzuth.
   </div>
 </div>
+<svg class="progress_gradients" hidden>
+  <defs>
+    <linearGradient id="ring" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="25%" stop-color="var(--sv-purple)" />
+      <stop offset="150%" stop-color="var(--sv-pink)" />
+    </linearGradient>
+  </defs>
+</svg>
+<svg class="progress_gradients" hidden>
+  <defs>
+    <linearGradient id="ring-highest-entry" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="25%" stop-color="gold" />
+      <stop offset="150%" stop-color="var(--sv-pink)" />
+    </linearGradient>
+  </defs>
+</svg>
 
 <script type="module">
   Array.from(document.querySelectorAll("input")).forEach((x) =>
     x.addEventListener("change", (e) => {
-      resetSortOrder()
-      document.querySelector(".sort-wr").dataset.sort = ("desc")
-      showData()
+      resetSortOrder();
+      document.querySelector(".sort-wr").dataset.sort = "desc";
+      showData();
     })
   );
   let urlParams = new URLSearchParams(window.location.search);
-  let tierlistData;
+  let tierlistData,
+    maxWr,
+    minWr,
+    minPr = 1;
 
   switch ((urlParams.get("mode") || "").toLowerCase()) {
     case "brsquad":
@@ -217,10 +230,19 @@
       .then((res) => res)
       .catch((err) => console.log(err));
     data.sort((a, b) => b.wr1.v - a.wr1.v);
+    let wrList = data.reduce((prev, curr) => {
+      prev.push(curr.wr1.v);
+      return prev;
+    }, []);
+    maxWr = Math.max(...wrList);
+    minWr = Math.min(...wrList);
+    data.forEach((x) => {
+      minPr = Math.min(minPr, x.pr.v);
+    });
     return data;
   }
 
-  async function drawList(list) {
+  async function drawList(list = []) {
     let entries = document.getElementById("entries");
     entries.innerHTML = "";
     let style =
@@ -232,6 +254,10 @@
     style.innerHTML = "";
     list.forEach((x, index) => {
       let entry = document.createElement("div");
+      let strokeWrNum =
+        2 * Math.PI * 26 * (1 - (x.wr1.v - minWr) / (maxWr - minWr));
+      let strokePrNum =
+        2 * Math.PI * 26 * (1 - (x.pr.v - minPr) / (x.pr.m - minPr));
       !(index % 2)
         ? entry.classList.add("entry", "neumorphic")
         : entry.classList.add("entry", "neumorphic");
@@ -250,7 +276,9 @@
             <span>Avg. K/D</span>
           </div>
         </div>
-        <div class="wr" title="Winrate: ${Math.round(x.wr1.v * 10000) / 100}%">
+        <div class="wr" title="${x.wr1.v - maxWr ? "" : "Highest "}Winrate: ${
+        Math.round(x.wr1.v * 10000) / 100
+      }%">
           <svg
               class="ring"
               viewBox="0 0 60 60"
@@ -268,7 +296,7 @@
                 stroke-width="8"
               />
               <circle
-                class="ring-stroke"
+                class="ring-stroke ${x.wr1.v - maxWr ? "" : "ring-highest-entry"}"
                 style="animation-name: ring-anim-wr-${index}"
                 cx="30"
                 cy="30"
@@ -278,9 +306,7 @@
                 stroke-linecap="round"
                 stroke-width="8"
                 stroke-dasharray="163.36 163.36"
-                stroke-dashoffset="${
-                  2 * Math.PI * 26 * (1 - x.wr1.v ** (1 / 4))
-                }"
+                stroke-dashoffset="${strokeWrNum}"
                 transform="rotate(-90,30,30)"
               />
               <text style="font: bold 12px poppins; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
@@ -306,7 +332,7 @@
                 stroke-width="8"
               />
               <circle
-                class="ring-stroke"
+                class="ring-stroke ${x.pr.v - x.pr.m ? "" : "ring-highest-entry"}"
                 style="animation-name: ring-anim-pr-${index}"
                 cx="30"
                 cy="30"
@@ -316,19 +342,7 @@
                 stroke-linecap="round"
                 stroke-width="8"
                 stroke-dasharray="163.36 163.36"
-                stroke-dashoffset="${
-                  2 *
-                  Math.PI *
-                  26 *
-                  (1 -
-                    x.pr.v *
-                      (document
-                        .getElementById("mode")
-                        .querySelector("input:checked")
-                        .value.toLowerCase() === "brduos"
-                        ? 2
-                        : 4))
-                }"
+                stroke-dashoffset="${strokePrNum}"
                 transform="rotate(-90,30,30)"
               />
               <text style="font: bold 12px poppins; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
@@ -338,13 +352,14 @@
           <span>Pickrate</span></div>
           <div></div>
         `;
+      // TODO: Table view with toggle (dont normalize values, use max rates (100% wr, pickrate based on 4/2queue))
       let keyframes = `
         @keyframes ring-anim-wr-${index} {
           from {
             stroke-dashoffset: 163.36;
           }
           to {
-            stroke-dashoffset: ${2 * Math.PI * 26 * (1 - x.wr1.v ** (1 / 4))};
+            stroke-dashoffset: ${strokeWrNum};
           }
         }
         @keyframes ring-anim-pr-${index} {
@@ -352,25 +367,17 @@
             stroke-dashoffset: 163.36;
           }
           to {
-            stroke-dashoffset: ${
-              2 *
-              Math.PI *
-              26 *
-              (1 -
-                x.pr.v *
-                  (document
-                    .getElementById("mode")
-                    .querySelector("input:checked")
-                    .value.toLowerCase() === "brduos"
-                    ? 2
-                    : 4))
-            };
+            stroke-dashoffset: ${strokePrNum};
           }
         }
         `;
       style.innerHTML += keyframes;
       entries.append(entry);
     });
+    if (!list.length) {
+      document.getElementById("entries").innerHTML =
+        "<br>No data found.<br><br><img src='https://cdn.discordapp.com/emojis/1128037371594686544.webp?size=96&quality=lossless' alt='Elluna cry emote'>";
+    }
   }
 </script>
     
