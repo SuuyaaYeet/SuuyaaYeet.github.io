@@ -285,7 +285,7 @@
 
   function init() {
     if (window.location.pathname.split("\\").pop().split("/").length > 3)
-      window.location = "/player";
+      window.location = "./player";
     let username = window.location.pathname.split("\\").pop().split("/").pop();
     if (
       window.location.pathname.split("\\").pop().split("/").length === 3 &&
