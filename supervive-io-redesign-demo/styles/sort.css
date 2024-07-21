@@ -21,14 +21,14 @@
 
 [data-sort] {
   span:before {
-    bottom: calc(1em - 2px);
+    bottom: calc(50% + 2px);
     border-bottom-color: white;
   }
 }
 
 [data-sort] {
   span:after {
-    top: calc(1em - 2px);
+    top: calc(50% + 2px);
     border-top-color: white;
   }
 }
@@ -36,7 +36,7 @@
 [data-sort="asc"] {
   color: var(--primary-complement);
   span:before {
-    bottom: calc(1em - 4px);
+    bottom: calc(50% + 4px);
     border: 8px solid transparent;
     border-bottom-color: var(--primary-complement);
   }
@@ -51,7 +51,7 @@
     visibility: hidden;
   }
   span:after {
-    bottom: calc(1em - 4px);
+    bottom: calc(50% + 4px);
     border: 8px solid transparent;
     border-top-color: var(--primary-complement);
   }

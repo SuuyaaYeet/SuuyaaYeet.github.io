@@ -797,7 +797,6 @@ html {
           .fav-hunter-portrait {
             justify-content: start;
             align-items: center;
-            /* width: 100%; */
             gap: 1em;
             span {
               font-size: 4em;
@@ -869,10 +868,19 @@ html {
           .sub-hunter-portrait {
             justify-content: start;
             align-items: center;
-            /* width: 100%; */
             gap: 0.7em;
             span {
               font-size: 1.7em;
+              * {
+                color: white;
+                text-decoration: none;
+              }
+            }
+            span:hover {
+              * {
+                transition: all 0.5s linear;
+                color: var(--sv-purple-light-complement);
+              }
             }
             img {
               height: 3em;
@@ -949,8 +957,22 @@ html {
     width: 100%;
     display: flex;
     overflow-x: scroll;
+    opacity: 0;
+    transition-delay: 0.6s;
     .wrapper {
+      width: 175%;
       align-self: baseline;
+      .queue-entries,
+      .hunter-entries {
+        > .flex-row > div {
+          overflow-x: scroll;
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        > .flex-row > div::-webkit-scrollbar {
+          display: none;
+        }
+      }
       h4 {
         box-shadow: var(--nm-in);
       }
@@ -970,21 +992,30 @@ html {
           gap: 1em;
           justify-content: space-between;
           > * {
-            width: 100%;
-            position: relative;
             min-width: 40px;
             flex: 1 1 0px;
-            overflow: hidden;
-            [data-sort] {
-              span:before,
-              span:after {
-                right: 0;
-              }
+            overflow: visible;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            gap: 0.5em;
+          }
+          [data-sort] {
+            span:before,
+            span:after {
+              right: -20px !important;
             }
-            span {
-              display: inline-block;
-              width: 100% !important;
-            }
+          }
+          span {
+            position: relative;
+            display: inline-block;
+            text-transform: capitalize;
+            line-height: 15px;
+          }
+          img {
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
           }
         }
       }
@@ -1020,4 +1051,19 @@ html {
   width: 100%;
   flex-grow: 1;
   margin-top: 2em;
+}
+
+.link-color {
+  color: white;
+  text-decoration: none;
+  * {
+    color: white;
+    text-decoration: none;
+  }
+}
+.link-color:hover {
+  * {
+    transition: all 0.5s linear;
+    color: var(--sv-purple-light-complement);
+  }
 }

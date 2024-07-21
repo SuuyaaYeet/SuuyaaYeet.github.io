@@ -75,10 +75,14 @@
       <div class="fav-hunters flex-row">
         <div id="fav-hunter-info" class="fav-hunter-info flex-col">
           <div id="fav-hunter-header" class="fav-hunter-header flex-row">
-            <div class="fav-hunter-portrait flex-row">
+            <a
+              class="fav-hunter-portrait flex-row link-color"
+              target="_blank"
+              href=""
+            >
               <img src="" alt="Hunter Portrait" />
               <span></span>
-            </div>
+            </a>
             <div
               id="fav-hunter-ratings"
               class="fav-hunter-ratings flex-row"
@@ -128,10 +132,14 @@
         <div id="sub-hunters" class="sub-hunters flex-col">
           <div id="sub-1" class="sub-hunter flex-col">
             <div class="sub-hunter-header">
-              <div class="sub-hunter-portrait flex-row">
+              <a
+                class="sub-hunter-portrait flex-row link-color"
+                target="_blank"
+                href=""
+              >
                 <img id="sub-1-portrait" src="" alt="" />
                 <span id="sub-1-hunter"></span>
-              </div>
+              </a>
             </div>
             <div class="sub-hunter-stats">
               <div class="flex-row">
@@ -177,10 +185,14 @@
           <!-- 2nd hunter -->
           <div id="sub-2" class="sub-hunter flex-col">
             <div class="sub-hunter-header">
-              <div class="sub-hunter-portrait flex-row">
+              <a
+                class="sub-hunter-portrait flex-row link-color"
+                target="_blank"
+                href=""
+              >
                 <img id="sub-2-portrait" src="" alt="" />
                 <span id="sub-2-hunter"></span>
-              </div>
+              </a>
             </div>
             <div class="sub-hunter-stats">
               <div class="flex-row">
@@ -265,7 +277,7 @@
   let searchInput = document.getElementById("search-input");
   searchInput.addEventListener("keyup", function (e) {
     if (e.key === "Enter" || e.keyCode === 13) {
-      window.history.pushState({}, "", `/Player/${searchInput.value}`);
+      window.history.pushState({}, "", `/player/${searchInput.value}`);
       showPlayer(searchInput.value);
     }
   });
@@ -284,8 +296,16 @@
   init();
 
   function init() {
-    if (window.location.pathname.split("\\").pop().split("/").length > 3)
-      window.location = "/player";
+    if (
+      window.location.pathname.split("/player")[1].split("\\").pop().split("/")
+        .length > 2
+    )
+      window.location =
+        window.location.pathname
+          .split("/player")[0]
+          .split("\\")
+          .pop()
+          .split("/")[0] + "/player";
     let username = window.location.pathname.split("\\").pop().split("/").pop();
     if (
       window.location.pathname.split("\\").pop().split("/").length === 3 &&
@@ -310,7 +330,7 @@
               entry.classList.add("search-result");
               entry.innerHTML = `${x.d} (${x.u})`;
               entry.onclick = () => {
-                window.history.pushState({}, "", `/Player/${x.d}`);
+                window.history.pushState({}, "", `/player/${x.d}`);
                 showPlayer(x.d);
               };
               searchResEl.append(entry);
@@ -346,6 +366,7 @@
       .then((res) => {
         res.forEach(async (x) => {
           delete x.userId;
+          x.winrate = Math.round((x.won / x.gamesPlayed) * 10000) / 10000;
           x["top-4s"] = 0;
           x.placementsJson = await JSON.parse(x.placementsJson);
           for (let count = 0; count < 4; count++) {
@@ -363,56 +384,156 @@
       return;
     }
     document.getElementById("player-info").style.display = "flex";
-
     let stats = splitQueue(result);
     let aggregate = getTotalStats(stats);
-    ["hunter-summary", "stats-summary"].forEach((x) => {
+    document.getElementById("page-title").classList.add("minify");
+    document.getElementById("search-input").classList.add("minify");
+    generateTopHunters(stats);
+    generateOverview(aggregate);
+
+    // Extra values (top 4 + winrate)
+    let cutoff = Object.keys(result[0]).length - 2; // -2 cuz of extra stats in fetch
+    Object.values(aggregate).forEach((x) => {
+      x.winrate = Math.round((x.won / x.gamesPlayed) * 10000) / 100;
+      x["top-4 rate"] = Math.round((x["top-4s"] / x.gamesPlayed) * 10000) / 100;
+    });
+    result.forEach((x) => {
+      x.winrate = Math.round((x.won / x.gamesPlayed) * 10000) / 100;
+      x["top-4 rate"] = Math.round((x["top-4s"] / x.gamesPlayed) * 10000) / 100;
+    });
+
+    let queuesArr = [],
+      huntersArr = [];
+    Object.values(aggregate).forEach((x) => {
+      let values = Object.values(x);
+      let queuesInsert = values.splice(
+        cutoff,
+        Object.values(x).length - cutoff
+      );
+      values.splice(4, 0, ...queuesInsert);
+      queuesArr.push(values);
+    });
+    result.forEach((x) => {
+      let values = Object.values(x);
+      let queuesInsert = values.splice(
+        cutoff,
+        Object.values(x).length - cutoff
+      );
+      values.splice(4, 0, ...queuesInsert);
+      huntersArr.push(values);
+    });
+
+    let filtersArr = Object.keys(result[0]);
+    let filtersInsert = filtersArr.splice(cutoff, filtersArr.length - cutoff);
+    filtersArr.splice(4, 0, ...filtersInsert);
+
+    // Generate
+
+    // filters first
+    addFilterEntry(filtersArr, document.getElementById("stat-filters"), false, {
+      queues: queuesArr,
+      hunters: huntersArr,
+      filters: filtersArr,
+    });
+
+    // entries
+    generateEntries(queuesArr, huntersArr, filtersArr);
+
+    // Animation
+    ["hunter-summary", "stats-summary", "stat-list"].forEach((x) => {
       setTimeout(() => {
         document
           .querySelector(x.startsWith(".") ? x : `.${x}`)
           .classList.add("appear");
       }, 1);
     });
-    document.getElementById("page-title").classList.add("minify");
-    document.getElementById("search-input").classList.add("minify");
-    generateTopHunters(stats);
-    generateOverview(aggregate);
-    generateEntries(Object.values(aggregate), result);
   }
 
   function addEntry(
     entry,
-    element = document.getElementById("hunter-entries"),
-    bgColor = true
+    parentElement = document.getElementById("hunter-entries"),
+    bgColor = true,
+    filters = [],
+    hunter = false
   ) {
     let el = document.createElement("div");
     el.classList.add("flex-row");
     if (bgColor) el.style.background = "var(--sv-purple-stripe)";
-    entry.forEach((x) => {
+    entry.forEach((x, index) => {
       let stat = document.createElement("div");
       if (typeof x === "object") x = JSON.stringify(x);
       stat.innerHTML = x || "-";
+      if (hunter && index === 1) {
+        stat = document.createElement("a");
+        stat.href = `https://supervive.wiki.gg/wiki/${x}`;
+        stat.alt = "Wiki link";
+        stat.classList.add("link-color");
+        stat.target = "_blank";
+        stat.innerHTML = `<span>${x}</span>`;
+        let img = document.createElement("img");
+        img.src = `https://assets.supervive.io/images/${x}.webp`;
+        img.alt = `${x} portrait`;
+        stat.prepend(img);
+      }
+      stat.title = filters[index] || "";
       el.append(stat);
     });
-    element.append(el);
+    parentElement.append(el);
   }
 
   function addFilterEntry(
     entry,
     element = document.getElementById("hunter-entries"),
-    bgColor = true
+    bgColor = true,
+    arrays = { queues: [], hunters: [], filter: [] }
   ) {
     let el = document.createElement("div");
     el.classList.add("flex-row");
     if (bgColor) el.style.background = "var(--sv-purple-stripe)";
     entry.forEach((x) => {
-      let wrapper = document.createElement("div")
-      wrapper.setAttribute("data-sort", "")
+      let wrapper = document.createElement("div");
+      wrapper.setAttribute("data-sort", "");
       let stat = document.createElement("span");
-      stat.setAttribute("data-sort-key", x)
+      stat.setAttribute("data-sort-key", x);
       if (typeof x === "object") x = JSON.stringify(x);
-      stat.innerHTML = x || "-";
-      wrapper.append(stat)
+      switch (x) {
+        case "gamesPlayed":
+          stat.innerHTML = "Games";
+          break;
+        case "placementsJson":
+          stat.innerHTML = "Placements";
+          break;
+        case "timePlayedSeconds":
+          stat.innerHTML = "Time played";
+          break;
+
+        default:
+          stat.innerHTML = x.split(/(?=[A-Z])/).join(" ") || "-";
+          break;
+      }
+      wrapper.title = stat.innerHTML;
+      wrapper.onclick = (e) => {
+        Array.from(document.querySelectorAll("[data-sort]")).forEach(
+          (sortEl) => {
+            if (sortEl !== e.target.parentElement)
+              sortEl.setAttribute("data-sort", "");
+          }
+        );
+        let sortIdx = arrays.filters.findIndex(
+          (x) => x === e.target.dataset.sortKey
+        );
+        if (e.target.parentElement.dataset.sort !== "desc") {
+          e.target.parentElement.dataset.sort = "desc";
+          arrays.queues.sort((a, b) => b[sortIdx] - a[sortIdx]);
+          arrays.hunters.sort((a, b) => b[sortIdx] - a[sortIdx]);
+        } else {
+          e.target.parentElement.dataset.sort = "asc";
+          arrays.queues.sort((a, b) => a[sortIdx] - b[sortIdx]);
+          arrays.hunters.sort((a, b) => a[sortIdx] - b[sortIdx]);
+        }
+        generateEntries(arrays.queues, arrays.hunters);
+      };
+      wrapper.append(stat);
       el.append(wrapper);
     });
     element.append(el);
@@ -443,12 +564,22 @@
         document
           .getElementById("fav-hunter-info")
           .querySelector(
+            ".fav-hunter-portrait"
+          ).href = `https://supervive.wiki.gg/wiki/${x.hero}`;
+        document
+          .getElementById("fav-hunter-info")
+          .querySelector(
             "img"
           ).src = `https://assets.supervive.io/images/${x.hero}.webp`;
         document
           .getElementById("fav-hunter-info")
           .querySelector("span").innerHTML = x.hero;
       } else {
+        document
+          .getElementById(`sub-${index}`)
+          .querySelector(
+            ".sub-hunter-portrait"
+          ).href = `https://supervive.wiki.gg/wiki/${x.hero}`;
         document
           .getElementById(`sub-${index}`)
           .querySelector(
@@ -469,7 +600,7 @@
         if (!el) return;
         el.innerHTML = x[y];
         let title = y.charAt(0).toUpperCase() + y.substring(1);
-        el.title = `${title}: ${x[y]}`;
+        el.parentElement.title = `${title}: ${x[y]}`;
       });
       if (!index) {
         document
@@ -534,29 +665,21 @@
     `;
   }
 
-  function generateEntries(queues, hunters) {
+  function generateEntries(queues, hunters, filters) {
+    // add Top 4 and winrate
     let bgCount = 0;
-    addFilterEntry(
-      Object.keys(queues[0]),
-      document.getElementById("stat-filters"),
-      false
-    );
+    // add queues and hunters here as param for onclick sort
     // sort entries here
-    // 
+    //
+    let queueEl = document.getElementById("queue-entries");
+    let hunterEl = document.getElementById("hunter-entries");
+    hunterEl.innerHTML = queueEl.innerHTML = "";
     queues.forEach((x) => {
-      addEntry(
-        Object.values(x),
-        document.getElementById("queue-entries"),
-        bgCount % 2
-      );
+      addEntry(Object.values(x), queueEl, bgCount % 2, filters);
       bgCount++;
     });
     hunters.forEach((x) => {
-      addEntry(
-        Object.values(x),
-        document.getElementById("hunter-entries"),
-        bgCount % 2
-      );
+      addEntry(Object.values(x), hunterEl, bgCount % 2, filters, true);
       bgCount++;
     });
   }
@@ -576,12 +699,6 @@
             aggregate[queue][key] = value;
           }
         });
-        aggregate[queue]["top-4s"] = 0;
-        for (let count = 0; count < 4; count++) {
-          if (aggregate[queue].placementsJson[count])
-            aggregate[queue]["top-4s"] +=
-              aggregate[queue].placementsJson[count];
-        }
       });
     });
     return aggregate;
@@ -663,7 +780,7 @@
     )}${characters.charAt(
       Math.floor(Math.random() * characters.length)
     )}${characters.charAt(Math.floor(Math.random() * characters.length))}`;
-    el.title = `${title}: ${Math.round(fillPercentage * 10000) / 100}`;
+    el.title = `${title}: ${Math.round(fillPercentage * 10000) / 100}%`;
     let keyframes = `
         @keyframes ring-anim-${el.id} {
           from {
