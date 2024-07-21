@@ -284,8 +284,17 @@
   init();
 
   function init() {
-    if (window.location.pathname.split("\\").pop().split("/").length > 3)
-      window.location = window.location.pathname.split("/player")[0] + "/player";
+        if (
+      window.location.pathname.split("/player")[1].split("\\").pop().split("/")
+        .length > 2
+    )
+      window.location =
+        window.location.pathname
+          .split("/player")[0]
+          .split("\\")
+          .pop()
+          .split("/")[0] + "/player";
+    let username = window.location.pathname.split("\\").pop().split("/").pop();
     let username = window.location.pathname.split("\\").pop().split("/").pop();
     if (
       window.location.pathname.split("\\").pop().split("/").length === 3 &&
