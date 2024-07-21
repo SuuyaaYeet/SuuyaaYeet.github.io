@@ -3,9 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
     <link rel="stylesheet" href="./styles/main.css" />
     <link rel="stylesheet" href="./styles/selection.css" />
-    <link rel="stylesheet" href="./styles/progressbar.css">
+    <link rel="stylesheet" href="./styles/progressbar.css" />
+    <link rel="stylesheet" href="./styles/sort.css" />
+
+    
     <title>Supervive.io - Tier List</title>
 
     <link
@@ -24,13 +29,20 @@
       <div class="components">
         <div class="header">
   <a class="title" href="/"
-    ><span><img src="./assets/supervive_logo_white.svg" alt="" />.io</span></a
+    ><span>
+      
+      <img src="./assets/supervive_logo_white.svg" alt="" />
+      .io</span
+    ></a
   >
   <div class="links">
+    
     <a href="./tierlist">Tier List</a>
     <a href="./leaderboard">Leaderboard</a>
     <a href="./player">Player Search</a>
-    <a href="https://supervive.wiki.gg"  target="_blank">wiki.gg</a>
+    
+
+    <a href="https://supervive.wiki.gg" target="_blank">wiki.gg</a>
   </div>
 </div>
  <script type="module">
@@ -38,7 +50,7 @@
     "Supervive.io - Tierlist";
 </script>
 <div class="main">
-  <h1>TIERLIST</h1>
+  <h1 id="page-title">TIERLIST</h1>
    <div>Data based on the top 1k ranked players</div>
 <div class="tierlist flex-col">
   <div class="filter-selection">
@@ -252,6 +264,7 @@
     style.id = "progress-anim-styles";
     style.type = "text/css";
     style.innerHTML = "";
+
     list.forEach((x, index) => {
       let entry = document.createElement("div");
       let strokeWrNum =
@@ -261,6 +274,7 @@
       !(index % 2)
         ? entry.classList.add("entry", "neumorphic")
         : entry.classList.add("entry", "neumorphic");
+      entry.style.transitionDelay = `${index * 0.05 > 3 ? 3 : index * 0.05}s`;
       entry.innerHTML = `
         <div><span>${index + 1}.</span></div>
         <a class="title" href="https://supervive.wiki.gg/wiki/${
@@ -296,8 +310,10 @@
                 stroke-width="8"
               />
               <circle
-                class="ring-stroke ${x.wr1.v - maxWr ? "" : "ring-highest-entry"}"
-                style="animation-name: ring-anim-wr-${index}"
+                class="ring-stroke ${
+                  x.wr1.v - maxWr ? "" : "ring-highest-entry"
+                }"
+                style="animation-name: ring-anim-wr-${index};"
                 cx="30"
                 cy="30"
                 r="26"
@@ -332,8 +348,10 @@
                 stroke-width="8"
               />
               <circle
-                class="ring-stroke ${x.pr.v - x.pr.m ? "" : "ring-highest-entry"}"
-                style="animation-name: ring-anim-pr-${index}"
+                class="ring-stroke ${
+                  x.pr.v - x.pr.m ? "" : "ring-highest-entry"
+                }"
+                style="animation-name: ring-anim-pr-${index};"
                 cx="30"
                 cy="30"
                 r="26"
@@ -373,6 +391,9 @@
         `;
       style.innerHTML += keyframes;
       entries.append(entry);
+      setTimeout(() => {
+        entry.classList.add("appear");
+      }, 1);
     });
     if (!list.length) {
       document.getElementById("entries").innerHTML =

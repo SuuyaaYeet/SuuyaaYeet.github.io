@@ -3,9 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+
     <link rel="stylesheet" href="../styles/main.css" />
     <link rel="stylesheet" href="../styles/selection.css" />
-    <link rel="stylesheet" href="../styles/progressbar.css">
+    <link rel="stylesheet" href="../styles/progressbar.css" />
+    <link rel="stylesheet" href="../styles/sort.css" />
+
+    
     <title>Supervive.io - Tier List</title>
 
     <link
@@ -24,13 +29,20 @@
       <div class="components">
         <div class="header">
   <a class="title" href="/"
-    ><span><img src="../assets/supervive_logo_white.svg" alt="" />.io</span></a
+    ><span>
+      
+      <img src="../assets/supervive_logo_white.svg" alt="" />
+      .io</span
+    ></a
   >
   <div class="links">
+    
     <a href="../tierlist">Tier List</a>
     <a href="../leaderboard">Leaderboard</a>
     <a href="../player">Player Search</a>
-    <a href="https://supervive.wiki.gg"  target="_blank">wiki.gg</a>
+    
+
+    <a href="https://supervive.wiki.gg" target="_blank">wiki.gg</a>
   </div>
 </div>
  <script type="module">
@@ -38,7 +50,7 @@
     "Supervive.io - Leaderboard";
 </script>
 <div class="main">
-  <h1>LEADERBOARD</h1>
+  <h1 id="page-title">LEADERBOARD</h1>
      <div class="filter-section ranked">
   <div class="filter-selection">
     <form id="queue">
@@ -60,7 +72,7 @@
       <div class="hunter-select" id="hunter-select">
         <div id="hunter-name" class="hunter-name">All Hunters</div>
         <div id="hunter-portrait" class="hunter-portrait">
-          <img src="" alt="Portrait" />
+          <img src="" hidden alt="Portrait" />
         </div>
         <div id="hunter-list" class="hunter-list">
           <div></div>
@@ -196,7 +208,7 @@
     bt.classList = "hunter-button";
     bt.innerHTML = `
   <img src="https://assets.supervive.io/images/${name}.webp" alt="Hunter portrait">
-  <div>${name}</div> 
+  <div>${name}</div>
   `;
     bt.onclick = () => selectHunter(name);
 
@@ -212,7 +224,10 @@
     if (name === "all") {
       document.getElementById("hunter-name").innerText = "All Hunters";
       setHunterPortrait("");
-      document.getElementById("hunter-portrait").style.display = "";
+      document
+        .getElementById("hunter-portrait")
+        .querySelector("img")
+        .setAttribute("hidden", "");
       return;
     }
     document.getElementById("hunter-name").innerText = name;
@@ -222,7 +237,7 @@
 
   function setHunterPortrait(name) {
     let portraitEl = document.getElementById("hunter-portrait");
-    portraitEl.style.display = "flex";
+    portraitEl.querySelector("img").removeAttribute("hidden");
     let img = portraitEl.querySelector("img");
     img.src = `https://assets.supervive.io/images/${name}.webp`;
     img.alt = `Portrait ${name}`;
@@ -252,7 +267,7 @@
     }
   }
   async function getLeaderBoardData(e) {
-    fetchController.abort()
+    fetchController.abort();
     fetchController = new AbortController();
     signal = fetchController.signal;
     generateFetchSignature();
@@ -277,20 +292,29 @@
     document.getElementById("entries").innerHTML = "";
     let entries = [];
     if (queue.toLowerCase() === "ranked") {
-      entries = await fetchSVData("Ranked");
+      fetchSVData("Ranked").then((entries) => {
+        spinner.setAttribute("hidden", "");
+        if (entries.length) {
+          entries.forEach((x) => addEntry(x, queue.toLowerCase(), stat));
+        } else {
+          document.getElementById("entries").innerHTML =
+            "<br>No data found.<br><br><img src='https://cdn.discordapp.com/emojis/1128037371594686544.webp?size=96&quality=lossless' alt='Elluna cry emote'>";
+        }
+      });
     } else {
-      entries = await fetchSVData(`${mode}_${time}_${stat}_${hunter}`);
-    }
-    spinner.setAttribute("hidden", "");
-    if (entries.length) {
-      entries.forEach((x) => addEntry(x));
-    } else {
-      document.getElementById("entries").innerHTML =
-        "<br>No data found.<br><br><img src='https://cdn.discordapp.com/emojis/1128037371594686544.webp?size=96&quality=lossless' alt='Elluna cry emote'>";
+      fetchSVData(`${mode}_${time}_${stat}_${hunter}`).then((entries) => {
+        spinner.setAttribute("hidden", "");
+        if (entries.length) {
+          entries.forEach((x) => addEntry(x, queue.toLowerCase(), stat));
+        } else {
+          document.getElementById("entries").innerHTML =
+            "<br>No data found.<br><br><img src='https://cdn.discordapp.com/emojis/1128037371594686544.webp?size=96&quality=lossless' alt='Elluna cry emote'>";
+        }
+      });
     }
   }
 
-  function addEntry(entry) {
+  function addEntry(entry, queue, stat) {
     let el = document.getElementById("entries");
     let newEntry = document.createElement("div");
     newEntry.classList.add("entry");
@@ -303,18 +327,20 @@
         ? `<img src="../assets/ranked_icons/${entry.n}.png">`
         : ""
     }</a></div>
-    <div class="cell stat"><img title="${
-      entry.d
-    }" src="../assets/ranked_icons/${entry.d.toLowerCase()}.png"><span>${
-      entry.v
-    } RP</span></div>
+    <div class="cell stat">${
+      queue === "ranked"
+        ? `<img title="${
+            entry.d
+          }" src="../assets/ranked_icons/${entry.d.toLowerCase()}.png">`
+        : ""
+    }<span>${entry.v} ${queue === "unranked" ? stat : "RP"}</span></div>
     <div class="cell"></div>
     `;
     el.append(newEntry);
   }
 
   async function fetchSVData(signature) {
-    let result = await fetch(
+    let result = fetch(
       `https://supervive.io/api/leaderboard/${signature}.json`,
       { signal }
     )
