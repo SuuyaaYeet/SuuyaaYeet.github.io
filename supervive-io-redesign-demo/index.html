@@ -81,6 +81,72 @@
       <span data-sort-key="pr">Pickrate</span>
     </div>
     <div></div>
+    <form class="list-toggle radio-toggles" id="list-toggle" name="view">
+      <input
+        id="view-diagram"
+        type="radio"
+        name="view"
+        checked
+        value="diagram"
+      />
+      <label for="view-diagram" title="Change to progress circle view">
+        <svg
+          class="ring"
+          viewBox="0 0 60 60"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="local-ring-svg-def" x1="1" y1="0" x2="0" y2="1">
+              <stop offset="150%" stop-color="white"></stop>
+            </linearGradient>
+          </defs>
+          <circle
+            cx="30"
+            cy="30"
+            r="26"
+            3=""
+            fill="none"
+            stroke="#7f7f7f"
+            stroke-width="8"
+            style="stroke: var(--grey); fill: none !important"
+          ></circle>
+          <circle
+            style="stroke: url(#local-ring-svg-def); fill: none !important"
+            cx="30"
+            cy="30"
+            r="26"
+            fill="none"
+            stroke="#000"
+            stroke-linecap="round"
+            stroke-width="8"
+            stroke-dasharray="163.36 163.36"
+            stroke-dashoffset="69"
+            transform="rotate(-90,30,30)"
+          ></circle>
+        </svg>
+      </label>
+      <input id="view-list" type="radio" name="view" value="list" />
+      <label for="view-list" title="Change to list view">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          fill="white"
+          version="1.1"
+          viewBox="0 0 1792 1792"
+          xml:space="preserve"
+        >
+          <path
+            d="M1673.9,1363.2L1673.9,1363.2c0,52.3-42.4,94.3-94.3,94.3H212.7c-52.3,0-94.3-42.4-94.3-94.3l0,0  c0-52.3,42.4-94.3,94.3-94.3h1366.8C1631.5,1268.5,1673.9,1310.9,1673.9,1363.2z"
+          />
+          <path
+            d="M1673.9,895.6L1673.9,895.6c0,52.3-42.4,94.3-94.3,94.3H659c-52.3,0-94.3-42.4-94.3-94.3l0,0c0-52.3,42.4-94.3,94.3-94.3  h920.6C1631.5,800.8,1673.9,843.2,1673.9,895.6z"
+          />
+          <path
+            d="M1673.9,427.9L1673.9,427.9c0,52.3-42.4,94.3-94.3,94.3H212.7c-52.3,0-94.3-42.4-94.3-94.3l0,0c0-52.3,42.4-94.3,94.3-94.3  h1366.8C1631.5,333.2,1673.9,375.6,1673.9,427.9z"
+          />
+        </svg>
+      </label>
+    </form>
   </div>
   <div hidden id="spinner"></div>
   <div id="entries" class="flex-col"></div>
@@ -144,11 +210,19 @@
 </svg>
 
 <script type="module">
-  Array.from(document.querySelectorAll("input")).forEach((x) =>
+  Array.from(document.querySelectorAll("input[name='mode']")).forEach((x) =>
     x.addEventListener("change", (e) => {
       resetSortOrder();
       document.querySelector(".sort-wr").dataset.sort = "desc";
       showData();
+    })
+  );
+  Array.from(document.querySelectorAll("input[name='view']")).forEach((x) =>
+    x.addEventListener("change", (e) => {
+      localStorage.setItem("tierlistViewSetting", e.target.value);
+      resetSortOrder();
+      document.querySelector(".sort-wr").dataset.sort = "desc";
+      drawList(tierlistData);
     })
   );
   let urlParams = new URLSearchParams(window.location.search);
@@ -176,7 +250,13 @@
     x.addEventListener("click", (e) => sortData(e));
   });
 
-  showData();
+  init();
+  function init() {
+    document.getElementById("list-toggle").view.value = localStorage.getItem(
+      "tierlistViewSetting"
+    );
+    showData();
+  }
 
   function sortData(e) {
     let key = e.target.dataset.sortKey;
@@ -228,6 +308,10 @@
     /** init loading spinner **/
     spinner.removeAttribute("hidden");
     tierlistData = await fetchTierlist();
+    if (!tierlistData.length) {
+      document.getElementById("entries").innerHTML =
+        "<br>No data found.<br><br><img src='https://cdn.discordapp.com/emojis/1128037371594686544.webp?size=96&quality=lossless' alt='Elluna cry emote'>";
+    }
     spinner.setAttribute("hidden", "");
     drawList(tierlistData);
   }
@@ -267,15 +351,14 @@
 
     list.forEach((x, index) => {
       let entry = document.createElement("div");
-      let strokeWrNum =
-        2 * Math.PI * 26 * (1 - (x.wr1.v - minWr) / (maxWr - minWr));
-      let strokePrNum =
-        2 * Math.PI * 26 * (1 - (x.pr.v - minPr) / (x.pr.m - minPr));
-      !(index % 2)
-        ? entry.classList.add("entry", "neumorphic")
-        : entry.classList.add("entry", "neumorphic");
+      // let strokeWrNum =
+      //   2 * Math.PI * 26 * (1 - (x.wr1.v - minWr) / (maxWr - minWr));
+      // let strokePrNum =
+      //   2 * Math.PI * 26 * (1 - (x.pr.v - minPr) / (x.pr.m - minPr));
       entry.style.transitionDelay = `${index * 0.05 > 3 ? 3 : index * 0.05}s`;
-      entry.innerHTML = `
+      if (document.getElementById("list-toggle").view.value === "diagram") {
+        entry.classList.add("entry", "neumorphic");
+        entry.innerHTML = `
         <div><span>${index + 1}.</span></div>
         <a class="title" href="https://supervive.wiki.gg/wiki/${
           x.h
@@ -290,115 +373,133 @@
             <span>Avg. K/D</span>
           </div>
         </div>
-        <div class="wr" title="${x.wr1.v - maxWr ? "" : "Highest "}Winrate: ${
-        Math.round(x.wr1.v * 10000) / 100
-      }%">
-          <svg
-              class="ring"
-              viewBox="0 0 60 60"
-              height="60"
-              width="60"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                class="ring-track"
-                cx="30"
-                cy="30"
-                r="26"3
-                fill="none"
-                stroke="#7f7f7f"
-                stroke-width="8"
-              />
-              <circle
-                class="ring-stroke ${
-                  x.wr1.v - maxWr ? "" : "ring-highest-entry"
-                }"
-                style="animation-name: ring-anim-wr-${index};"
-                cx="30"
-                cy="30"
-                r="26"
-                fill="none"
-                stroke="#000"
-                stroke-linecap="round"
-                stroke-width="8"
-                stroke-dasharray="163.36 163.36"
-                stroke-dashoffset="${strokeWrNum}"
-                transform="rotate(-90,30,30)"
-              />
-              <text style="font: bold 12px poppins; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
-                Math.round(x.wr1.v * 10000) / 100
-              }%</text>
-            </svg>
-          <span>Winrate</span></div>
-        <div class="pr" title="Pickrate: ${Math.round(x.pr.v * 10000) / 100}%">
-          <svg
-              class="ring"
-              viewBox="0 0 60 60"
-              height="60"
-              width="60"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                class="ring-track"
-                cx="30"
-                cy="30"
-                r="26"3
-                fill="none"
-                stroke="#7f7f7f"
-                stroke-width="8"
-              />
-              <circle
-                class="ring-stroke ${
-                  x.pr.v - x.pr.m ? "" : "ring-highest-entry"
-                }"
-                style="animation-name: ring-anim-pr-${index};"
-                cx="30"
-                cy="30"
-                r="26"
-                fill="none"
-                stroke="#000"
-                stroke-linecap="round"
-                stroke-width="8"
-                stroke-dasharray="163.36 163.36"
-                stroke-dashoffset="${strokePrNum}"
-                transform="rotate(-90,30,30)"
-              />
-              <text style="font: bold 12px poppins; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
-                Math.round(x.pr.v * 10000) / 100
-              }%</text>
-            </svg>
-          <span>Pickrate</span></div>
-          <div></div>
-        `;
-      // TODO: Table view with toggle (dont normalize values, use max rates (100% wr, pickrate based on 4/2queue))
-      let keyframes = `
-        @keyframes ring-anim-wr-${index} {
-          from {
-            stroke-dashoffset: 163.36;
-          }
-          to {
-            stroke-dashoffset: ${strokeWrNum};
-          }
+        ${
+          getProgressCircleHTML(
+            "Winrate",
+            "wr",
+            (x.wr1.v - minWr) / (maxWr - minWr),
+            x.wr1.v,
+            1,
+            100
+          ).outerHTML
         }
-        @keyframes ring-anim-pr-${index} {
-          from {
-            stroke-dashoffset: 163.36;
+          ${
+            getProgressCircleHTML(
+              "Pickrate",
+              "pr",
+              (x.pr.v - minPr) / (x.pr.m - minPr),
+              x.pr.v,
+              1,
+              100
+            ).outerHTML
           }
-          to {
-            stroke-dashoffset: ${strokePrNum};
-          }
-        }
+        <div></div>
         `;
-      style.innerHTML += keyframes;
+      } else {
+        if (!(index % 2)) entry.classList.add("striped");
+        entry.classList.add("entry", "entry-list");
+        entry.innerHTML = `
+        <div><span>${index + 1}.</span></div>
+         <a class="title" href="https://supervive.wiki.gg/wiki/${
+           x.h
+         }" target="_blank">
+          <img src="https://assets.supervive.io/images/${
+            x.h
+          }.webp" alt="Hunter portrait">${x.h}
+        </a>
+        <div class="kd">${Math.round(x.kd * 100) / 100}</div>
+        <div class="wr">${Math.round(x.wr1.v * 10000) / 100}%</div>
+        <div class="pr">${Math.round(x.pr.v * 10000) / 100}%</div>
+        `;
+      }
+
       entries.append(entry);
       setTimeout(() => {
         entry.classList.add("appear");
       }, 1);
     });
-    if (!list.length) {
-      document.getElementById("entries").innerHTML =
-        "<br>No data found.<br><br><img src='https://cdn.discordapp.com/emojis/1128037371594686544.webp?size=96&quality=lossless' alt='Elluna cry emote'>";
-    }
+  }
+
+  function getProgressCircleHTML(
+    title = "",
+    htmlClass = "",
+    fillPercentage = 0.5,
+    percentageText = fillPercentage,
+    threshhold = 0.2,
+    delay = 200
+  ) {
+    let characters = "abcdefghijklmnaopqrstuvxywABCDEFGHIJKLMNOPQRSTUVXYZ";
+    let el = document.createElement("div");
+    el.classList.add(htmlClass);
+    el.id = `ring-${title.replace(" ", "")}-${characters.charAt(
+      Math.floor(Math.random() * characters.length)
+    )}${characters.charAt(
+      Math.floor(Math.random() * characters.length)
+    )}${characters.charAt(Math.floor(Math.random() * characters.length))}`;
+    el.title = `${title}: ${Math.round(percentageText * 10000) / 100}%`;
+    let keyframes = `
+        @keyframes ring-anim-${el.id} {
+          from {
+            stroke-dashoffset: 163.36;
+          }
+          to {
+            stroke-dashoffset: ${Math.PI * 2 * 26 * (1 - fillPercentage)};
+          }
+        }
+        `;
+    document.head.querySelector("style").innerHTML += keyframes;
+    el.innerHTML = `
+      <svg
+          class="ring"
+          viewBox="0 0 60 60"
+          height="60"
+          width="60"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            class="ring-track"
+            cx="30"
+            cy="30"
+            r="26"3
+            fill="none"
+            stroke="#7f7f7f"
+            stroke-width="8"
+          />
+          <circle
+            class="ring-stroke ${
+              fillPercentage < threshhold ? "" : "ring-highest-entry"
+            }"
+            style="animation-name: ring-anim-${
+              el.id
+            }; animation-delay: ${delay}ms;"
+            cx="30"
+            cy="30"
+            r="26"
+            fill="none"
+            stroke="#000"
+            stroke-linecap="round"
+            stroke-width="8"
+            stroke-dasharray="163.36 163.36"
+            stroke-dashoffset="163.36"
+            transform="rotate(-90,30,30)"
+          />
+          <text style="font: bold 12px poppins; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
+            Math.round(percentageText * 10000) / 100
+          }%</text>
+        </svg>
+      <span style="font-weight: bold;">${title}</span>`;
+    setTimeout(() => {
+      [
+        document
+          .getElementById(el.id)
+          .querySelector("circle.ring-stroke")
+          .setAttribute(
+            "stroke-dashoffset",
+            `${Math.PI * 2 * 26 * (1 - fillPercentage)}`
+          ),
+      ];
+    }, delay);
+    return el;
   }
 </script>
     
