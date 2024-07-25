@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
 
     <link rel="stylesheet" href="../styles/main.css" />
     <link rel="stylesheet" href="../styles/selection.css" />
     <link rel="stylesheet" href="../styles/progressbar.css" />
     <link rel="stylesheet" href="../styles/sort.css" />
-
     
     <title>Supervive.io - Tier List</title>
 
@@ -30,17 +28,13 @@
         <div class="header">
   <a class="title" href="/"
     ><span>
-      
-      <img src="../assets/supervive_logo_white.svg" alt="" />
-      .io</span
+      <img src="../assets/supervive_logo_white.svg" alt="" />.io</span
     ></a
   >
   <div class="links">
-    
     <a href="../tierlist">Tier List</a>
     <a href="../leaderboard">Leaderboard</a>
     <a href="../player">Player Search</a>
-    
 
     <a href="https://supervive.wiki.gg" target="_blank">wiki.gg</a>
   </div>
@@ -210,48 +204,45 @@
 </svg>
 
 <script type="module">
-  Array.from(document.querySelectorAll("input[name='mode']")).forEach((x) =>
-    x.addEventListener("change", (e) => {
-      resetSortOrder();
-      document.querySelector(".sort-wr").dataset.sort = "desc";
-      showData();
-    })
-  );
-  Array.from(document.querySelectorAll("input[name='view']")).forEach((x) =>
-    x.addEventListener("change", (e) => {
-      localStorage.setItem("tierlistViewSetting", e.target.value);
-      resetSortOrder();
-      document.querySelector(".sort-wr").dataset.sort = "desc";
-      drawList(tierlistData);
-    })
-  );
-  let urlParams = new URLSearchParams(window.location.search);
+  const urlParams = new URLSearchParams(window.location.search);
   let tierlistData,
     maxWr,
     minWr,
     minPr = 1;
 
-  switch ((urlParams.get("mode") || "").toLowerCase()) {
-    case "brsquad":
-      document.getElementById("mode-0").click();
-      break;
-    case "brduos":
-      document.getElementById("mode-1").click();
-      break;
-    case "dm":
-      document.getElementById("mode-2").click();
-      break;
-
-    default:
-      break;
-  }
-
-  Array.from(document.querySelectorAll("[data-sort] > span")).forEach((x) => {
-    x.addEventListener("click", (e) => sortData(e));
-  });
-
   init();
   function init() {
+    /* Event listeners */
+    Array.from(document.querySelectorAll("input[name='mode']")).forEach((x) =>
+      x.addEventListener("change", (e) => {
+        resetSortOrder();
+        localStorage.setItem("tierlistModeSetting", e.target.value);
+        showData();
+      })
+    );
+    Array.from(document.querySelectorAll("input[name='view']")).forEach((x) =>
+      x.addEventListener("change", (e) => {
+        resetSortOrder();
+        localStorage.setItem("tierlistViewSetting", e.target.value);
+        document.querySelector(".sort-wr").dataset.sort = "desc";
+        drawList(tierlistData);
+      })
+    );
+    Array.from(document.querySelectorAll("[data-sort] > span")).forEach((x) => {
+      x.addEventListener("click", (e) => sortData(e));
+    });
+
+    /* Set default queue*/
+    document.getElementById("mode").mode.value =
+      localStorage.getItem("tierlistModeSetting") || "BRSquad";
+    let modeSelector = document.querySelector(
+      `input[value="${(urlParams.get("mode") || "").toLowerCase()}"i]`
+    );
+    if (modeSelector) {
+      document.getElementById("mode").mode.value = modeSelector.value;
+      localStorage.setItem("tierlistModeSetting", modeSelector.value);
+    }
+
     document.getElementById("list-toggle").view.value = localStorage.getItem(
       "tierlistViewSetting"
     );
@@ -365,12 +356,13 @@
         }" target="_blank">
           <img src="https://assets.supervive.io/images/${
             x.h
-          }.webp" alt="Hunter portrait">${x.h}
+          }.webp" alt="Hunter portrait">
+          <span>${x.h}</span>
         </a>
         <div class="kd">
           <div class="flex-col">
             <span>${Math.round(x.kd * 100) / 100}</span>
-            <span>Avg. K/D</span>
+            <span style="font-weight: bold">Avg. K/D</span>
           </div>
         </div>
         ${
@@ -410,6 +402,7 @@
         <div class="kd">${Math.round(x.kd * 100) / 100}</div>
         <div class="wr">${Math.round(x.wr1.v * 10000) / 100}%</div>
         <div class="pr">${Math.round(x.pr.v * 10000) / 100}%</div>
+        <div></div>
         `;
       }
 
@@ -552,16 +545,4 @@
       </div>
     </div>
   </body>
-  <script>
-    async function getHunters() {
-      let result =
-        (await fetch("https://supervive.io/api/statistics/BRSquad.json")
-          .then((res) => res.json())
-          .then((result) => result)
-          .catch((err) => console.log(err))) || [];
-      let hunters = [];
-      result.forEach((x) => hunters.push(x.h));
-      return hunters;
-    }
-  </script>
 </html>

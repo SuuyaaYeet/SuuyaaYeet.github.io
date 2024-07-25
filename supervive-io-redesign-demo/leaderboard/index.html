@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
 
     <link rel="stylesheet" href="../styles/main.css" />
     <link rel="stylesheet" href="../styles/selection.css" />
     <link rel="stylesheet" href="../styles/progressbar.css" />
     <link rel="stylesheet" href="../styles/sort.css" />
-
     
     <title>Supervive.io - Tier List</title>
 
@@ -30,17 +28,13 @@
         <div class="header">
   <a class="title" href="/"
     ><span>
-      
-      <img src="../assets/supervive_logo_white.svg" alt="" />
-      .io</span
+      <img src="../assets/supervive_logo_white.svg" alt="" />.io</span
     ></a
   >
   <div class="links">
-    
     <a href="../tierlist">Tier List</a>
     <a href="../leaderboard">Leaderboard</a>
     <a href="../player">Player Search</a>
-    
 
     <a href="https://supervive.wiki.gg" target="_blank">wiki.gg</a>
   </div>
@@ -66,15 +60,15 @@
     </form>
   </div>
 </div>
-<div class="unranked" id="unranked">
+<div class="unranked" id="unranked" hidden>
   <div class="unranked-filters">
     <div class="filter-section main">
       <div class="hunter-select" id="hunter-select">
-        <div id="hunter-name" class="hunter-name">All Hunters</div>
         <div id="hunter-portrait" class="hunter-portrait">
-          <img src="" hidden alt="Portrait" />
+          <img hidden alt="Portrait" />
         </div>
-        <div id="hunter-list" class="hunter-list">
+        <div id="hunter-name" class="hunter-name"><span>All Hunters</span></div>
+        <div id="hunter-list" class="hunter-list" hidden>
           <div></div>
           <div></div>
           <div id="close-hunter-list">
@@ -112,17 +106,21 @@
             />
             <label for="mode-0" id="mode-label-0"
               ><div class="flex-col">
-                <span>BR</span><span>Squad</span>
+                <img src=".../assets/squads.svg" alt="" /><span>BR Squad</span>
               </div></label
             >
             <input type="radio" id="mode-1" value="BRDuos" name="mode" />
-            <label for="mode-1" id="mode-label-1"
-              ><div class="flex-col">
-                <span>BR</span><span>Duos</span>
+            <label for="mode-1" id="mode-label-1">
+              <div class="flex-col">
+                <img src=".../assets/duos.svg" alt="" /><span>BR Duos</span>
               </div></label
             >
             <input type="radio" id="mode-2" value="DM" name="mode" />
-            <label for="mode-2" id="mode-label-2">DM</label>
+            <label for="mode-2" id="mode-label-2"
+              ><div class="flex-col">
+                <img src=".../assets/dm.svg" alt="" /><span>DM</span>
+              </div></label
+            >
             <div class="control-background"></div>
           </div>
         </form>
@@ -130,16 +128,10 @@
       <div class="filter-selection">
         <form id="time">
           <div class="radio-group time-radio">
-            <input
-              type="radio"
-              id="time-0"
-              value="Weekly"
-              checked
-              name="time"
-            />
-            <label for="time-0" id="time-label-0">Weekly</label>
-            <input type="radio" id="time-1" value="Daily" name="time" />
-            <label for="time-1" id="time-label-1">Daily</label>
+            <input type="radio" id="time-0" checked value="daily" name="time" />
+            <label for="time-0" id="time-label-0">Daily</label>
+            <input type="radio" id="time-1" value="Weekly" name="time" />
+            <label for="time-1" id="time-label-1">Weekly</label>
             <div class="control-background"></div>
           </div>
         </form>
@@ -171,39 +163,74 @@
 
 <script type="module">
   let fetchController = new AbortController();
-  let signal;
-  Array.from(document.querySelectorAll("input")).forEach((x) =>
-    x.addEventListener("change", (e) => getLeaderBoardData(e))
+  let signal = fetchController.signal;
+  const urlParams = new URLSearchParams(window.location.search);
+  const filterParams = new URLSearchParams(
+    localStorage.getItem("leaderboardUnrankedFilter")
   );
-  document.getElementById("queue").addEventListener("change", (e) => {
-    if (e.target === document.getElementById("queue-1")) {
-      document.getElementById("unranked").classList.add("visible");
-    } else {
-      document.getElementById("unranked").classList.remove("visible");
-    }
-  });
+  const spinner = document.getElementById("spinner");
+  init();
+  async function init() {
+    const unrankedArea = document.getElementById("unranked");
+    // Even Listeners
+    Array.from(document.querySelectorAll("input")).forEach((x) =>
+      x.addEventListener("change", (e) => {
+        urlParams.set(x.name, x.value);
+        filterParams.set(x.name, x.value);
+        localStorage.setItem(
+          "leaderboardUnrankedFilter",
+          filterParams.toString()
+        );
+        // window.history.pushState({}, "", "?" + urlParams.toString());
+        getLeaderBoardData(e);
+      })
+    );
+    document.getElementById("hunter-select").onclick = (e) =>
+      openHunterSelect(e);
+    document.getElementById("close-hunter-list").onclick = (e) =>
+      closeHunterSelect(e);
+    document.getElementById("queue").addEventListener("change", (e) => {
+      if (e.target.form.queue.value === "Unranked") {
+        unrankedArea.removeAttribute("hidden");
+        unrankedArea.classList.add("visible");
+      } else {
+        unrankedArea.setAttribute("hidden", "");
+        unrankedArea.classList.remove("visible");
+      }
+    });
 
-  let urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get("queue") === "unranked") {
-    document.getElementById("queue-1").click();
+    // Form eval
+    // local storage 1st
+    new URLSearchParams(
+      localStorage.getItem("leaderboardUnrankedFilter")
+    ).forEach((val, key) => {
+      let inputEl = document.querySelector(`input[value="${val}" i]`);
+      if (!document.getElementById(key) || !inputEl) return;
+      document.getElementById(key)[key].value = inputEl.value;
+    });
+    // url search params 2nd
+    urlParams.forEach((val, key) => {
+      let inputEl = document.querySelector(`input[value="${val}" i]`);
+      if (!document.getElementById(key) || !inputEl) return;
+      document.getElementById(key)[key].value = inputEl.value;
+    });
+
+    if (
+      document.getElementById("queue").queue.value.toLowerCase() === "unranked"
+    ) {
+      unrankedArea.removeAttribute("hidden");
+      unrankedArea.classList.add("visible");
+    }
+
+    await generateFetchSignature();
+    let hunters = await getHunters();
+    ["all", ...hunters].sort().forEach((x) => {
+      createHunterSelectButton(x);
+    });
   }
 
-  const leaderboard = document.getElementById("leaderboard");
-  const spinner = document.getElementById("spinner");
-
-  await generateFetchSignature();
-
-  document.getElementById("hunter-select").onclick = (e) => openHunterSelect(e);
-  document.getElementById("close-hunter-list").onclick = (e) =>
-    closeHunterSelect(e);
-
-  let hunters = await getHunters();
-  let selectionEl = document.getElementById("hunter-list");
-  ["all", ...hunters].sort().forEach((x) => {
-    createHunterSelectButton(x);
-  });
-
   function createHunterSelectButton(name) {
+    let selectionEl = document.getElementById("hunter-list");
     let bt = document.createElement("div");
     bt.classList = "hunter-button";
     bt.innerHTML = `
@@ -222,7 +249,8 @@
   function selectHunter(name) {
     document.getElementById("hunter").value = name;
     if (name === "all") {
-      document.getElementById("hunter-name").innerText = "All Hunters";
+      document.getElementById("hunter-name").querySelector("span").innerText =
+        "All Hunters";
       setHunterPortrait("");
       document
         .getElementById("hunter-portrait")
@@ -230,7 +258,8 @@
         .setAttribute("hidden", "");
       return;
     }
-    document.getElementById("hunter-name").innerText = name;
+    document.getElementById("hunter-name").querySelector("span").innerText =
+      name;
     setHunterPortrait(name);
     generateFetchSignature();
   }
@@ -246,11 +275,11 @@
   function openHunterSelect(e) {
     e.stopPropagation();
     let el = document.getElementById("hunter-list");
-    if (el.classList.contains("visible") && !el.contains(e.target)) {
-      el.classList.remove("visible");
+    if (!el.hasAttribute("hidden") && !el.contains(e.target)) {
+      el.classList.addAttribute("hidden", "");
       return;
     } else {
-      el.classList.add("visible");
+      el.removeAttribute("hidden");
     }
 
     document.body.addEventListener("click", closeHunterSelect);
@@ -262,7 +291,7 @@
       e.target !== document.getElementById("hunter-list") ||
       e.target === document.getElementById("close-hunter-list")
     ) {
-      document.getElementById("hunter-list").classList.remove("visible");
+      document.getElementById("hunter-list").setAttribute("hidden", "");
       document.body.removeEventListener("click", closeHunterSelect);
     }
   }
@@ -274,18 +303,10 @@
   }
 
   async function generateFetchSignature() {
-    let queue = document
-      .getElementById("queue")
-      .querySelector("input:checked").value;
-    let mode = document
-      .getElementById("mode")
-      .querySelector("input:checked").value;
-    let time = document
-      .getElementById("time")
-      .querySelector("input:checked").value;
-    let stat = document
-      .getElementById("stat")
-      .querySelector("input:checked").value;
+    let queue = document.getElementById("queue").queue.value;
+    let mode = document.getElementById("mode").mode.value;
+    let time = document.getElementById("time").time.value;
+    let stat = document.getElementById("stat").stat.value;
     let hunter = document.getElementById("hunter").value;
     /** init loading spinner **/
     spinner.removeAttribute("hidden");
@@ -320,7 +341,7 @@
     newEntry.classList.add("entry");
     newEntry.innerHTML = `
     <div class="cell">${entry.n}.</div>
-    <div class="cell"><a class="playername" href="../player/${
+    <div class="cell"><a class="playername" href="../player?id=${
       entry.p
     }" target="_blank">${entry.p} ${
       [1, 2, 3].some((x) => x === entry.n)
@@ -334,8 +355,8 @@
           }" src="../assets/ranked_icons/${entry.d.toLowerCase()}.png">`
         : ""
     }<span>${entry.v} ${queue === "unranked" ? stat : "RP"}</span></div>
-    <div class="cell"></div>
     `;
+    // <div class="cell"></div> // Filler cell for flex
     el.append(newEntry);
   }
 
@@ -348,6 +369,17 @@
       .then((result) => result)
       .catch((err) => err);
     return result || [];
+  }
+
+  async function getHunters() {
+    let result =
+      (await fetch("https://supervive.io/api/statistics/BRSquad.json")
+        .then((res) => res.json())
+        .then((result) => result)
+        .catch((err) => console.log(err))) || [];
+    let hunters = [];
+    result.forEach((x) => hunters.push(x.h));
+    return hunters;
   }
 </script>
   
@@ -400,16 +432,4 @@
       </div>
     </div>
   </body>
-  <script>
-    async function getHunters() {
-      let result =
-        (await fetch("https://supervive.io/api/statistics/BRSquad.json")
-          .then((res) => res.json())
-          .then((result) => result)
-          .catch((err) => console.log(err))) || [];
-      let hunters = [];
-      result.forEach((x) => hunters.push(x.h));
-      return hunters;
-    }
-  </script>
 </html>

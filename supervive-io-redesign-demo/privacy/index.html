@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
 
     <link rel="stylesheet" href="../styles/main.css" />
     <link rel="stylesheet" href="../styles/selection.css" />
     <link rel="stylesheet" href="../styles/progressbar.css" />
     <link rel="stylesheet" href="../styles/sort.css" />
-
     
     <title>Supervive.io - Tier List</title>
 
@@ -30,17 +28,13 @@
         <div class="header">
   <a class="title" href="/"
     ><span>
-      
-      <img src="../assets/supervive_logo_white.svg" alt="" />
-      .io</span
+      <img src="../assets/supervive_logo_white.svg" alt="" />.io</span
     ></a
   >
   <div class="links">
-    
     <a href="../tierlist">Tier List</a>
     <a href="../leaderboard">Leaderboard</a>
     <a href="../player">Player Search</a>
-    
 
     <a href="https://supervive.wiki.gg" target="_blank">wiki.gg</a>
   </div>
@@ -325,16 +319,4 @@ Privacy Policy, please contact us.
       </div>
     </div>
   </body>
-  <script>
-    async function getHunters() {
-      let result =
-        (await fetch("https://supervive.io/api/statistics/BRSquad.json")
-          .then((res) => res.json())
-          .then((result) => result)
-          .catch((err) => console.log(err))) || [];
-      let hunters = [];
-      result.forEach((x) => hunters.push(x.h));
-      return hunters;
-    }
-  </script>
 </html>

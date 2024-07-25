@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
 
     <link rel="stylesheet" href="../styles/main.css" />
     <link rel="stylesheet" href="../styles/selection.css" />
     <link rel="stylesheet" href="../styles/progressbar.css" />
     <link rel="stylesheet" href="../styles/sort.css" />
-    
     
     <title>Supervive.io - Tier List</title>
 
@@ -30,15 +28,13 @@
         <div class="header">
   <a class="title" href="/"
     ><span>
-      
       <img src="../assets/supervive_logo_white.svg" alt="" />.io</span
     ></a
   >
   <div class="links">
-    
-    <a href=".../tierlist">Tier List</a>
-    <a href=".../leaderboard">Leaderboard</a>
-    <a href=".../player">Player Search</a> 
+    <a href="../tierlist">Tier List</a>
+    <a href="../leaderboard">Leaderboard</a>
+    <a href="../player">Player Search</a>
 
     <a href="https://supervive.wiki.gg" target="_blank">wiki.gg</a>
   </div>
@@ -151,7 +147,7 @@
               target="_blank"
               href=""
             >
-              <img src="" alt="Hunter Portrait" />
+              <img alt="Hunter Portrait" />
               <span></span>
             </a>
             <div
@@ -162,35 +158,31 @@
           <div class="fav-hunter-stats flex-col">
             <div class="flex-row">
               <div class="flex-row">
-                <img src="../assets/games_played.svg" alt="" /><span
-                  id="fav-hunter-gamesPlayed"
-                  >0</span
-                >
+                <!-- <img src="../assets/games_played.svg" alt="" /> -->
+                <h4>Games</h4>
+                <span id="fav-hunter-gamesPlayed">0</span>
               </div>
               <div class="flex-row">
-                <img src="../assets/ranked_icons/1.png" alt="" /><span
-                  id="fav-hunter-won"
-                  >0</span
-                >
+                <!-- <img src="../assets/ranked_icons/1.png" alt="" /> -->
+                <h4>Wins</h4>
+                <span id="fav-hunter-won">0</span>
               </div>
               <div class="flex-row">
-                <!-- <img src="../assets/top_4.png" alt="" /> -->
+                <!-- <img src="../assets/top_4.svg" alt="" /> -->
                 <h4>Top-4s</h4>
                 <span id="fav-hunter-top-4s">0</span>
               </div>
             </div>
             <div class="flex-row">
               <div class="flex-row">
-                <img src="../assets/knocks_colored.png" alt="" /><span
-                  id="fav-hunter-kills"
-                  >0</span
-                >
+                <!-- <img src="../assets/knocks_colored.png" alt="" /> -->
+                <h4>Kills</h4>
+                <span id="fav-hunter-kills">0</span>
               </div>
               <div class="flex-row">
-                <img src="../assets/deaths_colored.png" alt="" /><span
-                  id="fav-hunter-deaths"
-                  >0</span
-                >
+                <!-- <img src="../assets/deaths_colored.png" alt="" /> -->
+                <h4>Deaths</h4>
+                <span id="fav-hunter-deaths">0</span>
               </div>
               <div class="flex-row">
                 <h4>K/D</h4>
@@ -208,7 +200,7 @@
                 target="_blank"
                 href=""
               >
-                <img id="sub-1-portrait" src="" alt="" />
+                <img id="sub-1-portrait" alt="" />
                 <span id="sub-1-hunter"></span>
               </a>
             </div>
@@ -227,8 +219,7 @@
                   >
                 </div>
                 <div class="flex-row">
-                  <img src="../assets/top_4.png" alt="" /><span
-                    id="sub-1-top-4s"
+                  <img src="../assets/top_4.svg" alt="" /><span id="sub-1-top-4s"
                     >0</span
                   >
                 </div>
@@ -247,7 +238,7 @@
                   >
                 </div>
                 <div class="flex-row">
-                  <!-- <img src="../assets/assists.png" alt="" /> -->
+                  <img src="../assets/kd.svg" alt="" />
                   <span id="sub-1-kd">0</span>
                 </div>
               </div>
@@ -261,7 +252,7 @@
                 target="_blank"
                 href=""
               >
-                <img id="sub-2-portrait" src="" alt="" />
+                <img id="sub-2-portrait" alt="" />
                 <span id="sub-2-hunter"></span>
               </a>
             </div>
@@ -280,8 +271,7 @@
                   >
                 </div>
                 <div class="flex-row">
-                  <img src="../assets/top_4.png" alt="" /><span
-                    id="sub-2-top-4s"
+                  <img src="../assets/top_4.svg" alt="" /><span id="sub-2-top-4s"
                     >0</span
                   >
                 </div>
@@ -300,7 +290,7 @@
                   >
                 </div>
                 <div class="flex-row">
-                  <!-- <img src="../assets/assists.png" alt="" /> -->
+                  <img src="../assets/kd.svg" alt="" />
                   <span id="sub-2-kd">0</span>
                 </div>
               </div>
@@ -419,18 +409,20 @@
   </p>
 </div>
 <script>
-  let searchInput = document.getElementById("search-input");
+  const searchInput = document.getElementById("search-input");
+  const urlParams = new URLSearchParams(window.location.search);
   searchInput.addEventListener("keyup", function (e) {
     if (e.key === "Enter" || e.keyCode === 13) {
-      window.history.pushState({}, "", `/player/${searchInput.value}`);
+      urlParams.set("id", searchInput.value);
+      window.history.pushState({}, "", "?" + urlParams.toString());
       showPlayer(searchInput.value);
     }
   });
-  let searchResEl = document.getElementById("search-results");
+  const searchResEl = document.getElementById("search-results");
   let searchDelay = null;
   searchInput.addEventListener("input", (e) => searchPlayers(e));
   searchInput.addEventListener("focus", (e) => searchPlayers(e));
-  let style =
+  const style =
     document.getElementById("progress-anim-styles") ||
     document.createElement("style");
   document.head.append(style);
@@ -441,22 +433,7 @@
   init();
 
   function init() {
-    if (
-      window.location.pathname.split("/player")[1].split("\\").pop().split("/")
-        .length > 2
-    )
-      window.location =
-        window.location.pathname
-          .split("/player")[0]
-          .split("\\")
-          .pop()
-          .split("/")[0] + "/player";
-    let username = window.location.pathname.split("\\").pop().split("/").pop();
-    if (
-      window.location.pathname.split("\\").pop().split("/").length === 3 &&
-      username
-    )
-      showPlayer(username);
+    if (urlParams.has("id")) showPlayer(urlParams.get("id"));
   }
 
   function searchPlayers(e) {
@@ -464,18 +441,22 @@
     searchDelay = setTimeout(() => {
       searchDelay = null;
       try {
+        const searchIcon = document.getElementById("search-icon");
+        searchIcon.setAttribute("loading", "");
         let results = fetch(
           "https://supervive.io/api/search?query=" + e.target.value
         )
           .then((res) => res.json())
           .then((result) => {
+            searchIcon.removeAttribute("loading");
             searchResEl.innerHTML = "";
             result.forEach((x) => {
               let entry = document.createElement("div");
               entry.classList.add("search-result");
               entry.innerHTML = `${x.d} (${x.u})`;
               entry.onclick = () => {
-                window.history.pushState({}, "", `/player/${x.d}`);
+                urlParams.set("id", searchInput.value);
+                window.history.pushState({}, "", "?" + urlParams.toString());
                 showPlayer(x.d);
               };
               searchResEl.append(entry);
@@ -501,7 +482,7 @@
     ).innerHTML = `${username.toUpperCase()}`;
     document.getElementById("player-info").style.display = "none";
     document.getElementById("elluna-cry").setAttribute("hidden", "");
-    let spinner = document.getElementById("spinner");
+    const spinner = document.getElementById("spinner");
     spinner.removeAttribute("hidden");
     document.getElementById("player-page-info").setAttribute("hidden", "");
     let result = await fetch(
@@ -608,15 +589,6 @@
     let filtersInsert = filtersArr.splice(cutoff, filtersArr.length - cutoff);
     filtersArr.splice(4, 0, ...filtersInsert);
 
-    // Generate
-
-    // filters first
-    addFilterEntry(filtersArr, document.getElementById("stat-filters"), false, {
-      queues: queuesArr,
-      hunters: huntersArr,
-      filters: filtersArr,
-    });
-
     // entries
     generateEntries(queuesArr, huntersArr, filtersArr);
 
@@ -657,6 +629,17 @@
         stat.prepend(img);
       }
       stat.title = filters[index] || "";
+      switch (filters[index]) {
+        case "timePlayedSeconds":
+          stat.innerHTML = `${Math.round((10 * x) / 60 ** 2) / 10} hours`;
+          stat.title = `${Math.round(x / 60 ** 2)} hours and ${
+            Math.round(10 * ((x % 60 ** 2) / 60)) / 10
+          } minutes`;
+          // TODO Check if filters[0] is deathmatch, if so add css class to show ! with title
+          break;
+        default:
+          break;
+      }
       el.append(stat);
     });
     parentElement.append(el);
@@ -668,6 +651,7 @@
     bgColor = true,
     arrays = { queues: [], hunters: [], filter: [] }
   ) {
+    element.innerHTML = "";
     let el = document.createElement("div");
     el.classList.add("flex-row");
     if (bgColor) el.style.background = "var(--sv-purple-stripe)";
@@ -850,8 +834,10 @@
         <div><b>${totalDeaths} Deaths</b> (Total)</div>
       </div>
       <div title="${Math.floor((totalKills / totalDeaths) * 100000) / 100000}">
-        <b>${Math.round((totalKills / totalDeaths) * 100) / 100}</b>
-        <span>K/D</span>
+        <div class="flex-col">
+          <b>
+            ${Math.round((totalKills / totalDeaths) * 100) / 100}</b>
+          <span>K/D</span></div>
       </div>
     </div>
     <div title="${Math.floor(totalTimePlayed / 60 / 60 / 24)} days ${Math.floor(
@@ -863,6 +849,13 @@
   }
 
   function generateEntries(queues, hunters, filters) {
+    // filters first
+    addFilterEntry(filters, document.getElementById("stat-filters"), false, {
+      queues: queues,
+      hunters: hunters,
+      filters: filters,
+    });
+
     // add Top 4 and winrate
     let bgCount = 0;
     // add queues and hunters here as param for onclick sort
@@ -992,16 +985,16 @@
     el.innerHTML = `
       <svg
           class="ring"
-          viewBox="0 0 60 60"
-          height="60"
+          viewBox="0 0 60 80"
           width="60"
+          height="80"
           xmlns="http://www.w3.org/2000/svg"
         >
           <circle
             class="ring-track"
             cx="30"
             cy="30"
-            r="26"3
+            r="26"
             fill="none"
             stroke="#7f7f7f"
             stroke-width="8"
@@ -1027,8 +1020,11 @@
           <text style="font: bold 12px poppins; color: white" x="30" y="30" text-anchor="middle" dominant-baseline="middle"  fill="white">${
             Math.round(fillPercentage * 10000) / 100
           }%</text>
+          <text style="font: bold 14px poppins; color: white" x="30" y="75" text-anchor="middle" dominant-baseline="middle"  fill="white">
+            ${title}
+          </text>
         </svg>
-      <span style="font-weight: bold;">${title}</span>`;
+    `;
     setTimeout(() => {
       [
         document
@@ -1113,16 +1109,4 @@
       </div>
     </div>
   </body>
-  <script>
-    async function getHunters() {
-      let result =
-        (await fetch("https://supervive.io/api/statistics/BRSquad.json")
-          .then((res) => res.json())
-          .then((result) => result)
-          .catch((err) => console.log(err))) || [];
-      let hunters = [];
-      result.forEach((x) => hunters.push(x.h));
-      return hunters;
-    }
-  </script>
 </html>

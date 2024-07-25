@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <style>
+    text {
+      font-family: "Poppins", sans-serif;
+      fill: #FFFFFF
+    }
+
+    .K,
+    .D {
+      font: bold 20px sans-serif;
+    }
+  </style>
+  <text text-anchor="middle" class="K" x="8" y="24">K</text>
+  <text text-anchor="middle" class="D" x="24" y="24">D</text>
+</svg>
