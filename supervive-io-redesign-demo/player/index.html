@@ -411,6 +411,8 @@
   </p>
 </div>
 <script>
+  let playerSearchController = new AbortController();
+  let signal = playerSearchController.signal;
   const searchInput = document.getElementById("search-input");
   const urlParams = new URLSearchParams(window.location.search);
   searchInput.addEventListener("keyup", function (e) {
@@ -468,12 +470,16 @@
   function searchPlayers(e) {
     clearTimeout(searchDelay);
     searchDelay = setTimeout(() => {
+      playerSearchController.abort();
+      playerSearchController = new AbortController();
+      signal = playerSearchController.signal;
       searchDelay = null;
       try {
         const searchIcon = document.getElementById("search-icon");
         searchIcon.setAttribute("loading", "");
         let results = fetch(
-          "https://supervive.io/api/search?query=" + e.target.value
+          "https://supervive.io/api/search?query=" + e.target.value,
+          { signal }
         )
           .then((res) => res.json())
           .then((result) => {
