@@ -1109,6 +1109,69 @@ html {
   }
 }
 
+.placements-button {
+  box-shadow: var(--nm-out);
+  color: white;
+  font-size: 0.7em;
+  background: var(--primary-dark);
+  text-align: center;
+  border-radius: 1em;
+  padding: 0.5em;
+  cursor: pointer;
+}
+.placements-button:hover {
+  color: var(--sv-purple-light-complement);
+}
+.placements-button:active,
+.placements-button:focus {
+  box-shadow: var(--nm-in);
+}
+
+.placements-list {
+  background: var(--primary-dark);
+  border-radius: 0.5em;
+  box-shadow: var(--nm-out);
+  padding: 1em;
+  gap: 0.5em;
+  position: absolute;
+  top: 0;
+  left: calc(100% + 1em);
+  z-index: 100;
+  .placement {
+    width: 100%;
+    > * {
+      flex: 1 1 0px;
+      text-align: center;
+    }
+    :first-child {
+      justify-content: flex-start;
+    }
+    display: flex;
+    gap: 1em;
+  }
+}
+.placements-list[hidden] {
+  display: none;
+}
+
+.dm-time-warning {
+  position: relative;
+  overflow: visible !important;
+}
+.dm-time-warning:after {
+  content: "!";
+  color: red;
+  word-break: keep-all;
+  font-weight: bold;
+  position: absolute;
+  font-size: var(--fs-small);
+  top: calc(var(--fs-small) * -0.5);
+  right: calc(-1 * var(--fs-small));
+}
+/* .dm-time-warning:hover:after {
+  content: "Deathmatch times are not accurate"
+} */
+
 .appear {
   transition: all 1s ease;
   opacity: 1 !important;
@@ -1174,6 +1237,11 @@ html {
   .ranked {
     margin-bottom: 2em;
   }
+  .data-group-total {
+    :last-child {
+      align-items: center !important;
+    }
+  }
 }
 
 @media screen and (max-width: 1254px) {
@@ -1184,12 +1252,6 @@ html {
       img {
         width: 3em;
       }
-    }
-  }
-
-  .data-group-total {
-    :last-child {
-      align-items: center !important;
     }
   }
 }

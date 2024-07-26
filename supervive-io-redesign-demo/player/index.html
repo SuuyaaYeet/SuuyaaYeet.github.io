@@ -44,7 +44,9 @@
     "Supervive.io - Player";
 </script>
 <div class="main">
-  <h1 id="page-title">PLAYER SEARCH</h1>
+  <h1 id="page-title">
+    PLAYER SEARCH
+  </h1>
       <div class="search">
   <div class="search-field">
     <input
@@ -434,6 +436,33 @@
 
   function init() {
     if (urlParams.has("id")) showPlayer(urlParams.get("id"));
+    Array.from(
+      document
+        .getElementById("hunter-stats-toggles")
+        .querySelectorAll("input[type='checkbox']")
+    ).forEach((x) => {
+      if (localStorage.getItem("hunterStats" + x.name) === "true")
+        x.checked = true;
+    });
+    Array.from(
+      document
+        .getElementById("summary-stats-toggles")
+        .querySelectorAll("input[type='checkbox']")
+    ).forEach((x) => {
+      if (localStorage.getItem("summaryStats" + x.name) === "true")
+        x.checked = true;
+    });
+
+    // Listener to remove lists generated in
+    document.body.addEventListener("click", (e) => {
+      if (
+        Array.from(document.querySelectorAll(".placements-list")).some(
+          (x) => x.contains(e.target) || e.target === x.previousSibling
+        )
+      )
+        return;
+      hideAllPlacementLists();
+    });
   }
 
   function searchPlayers(e) {
@@ -455,7 +484,7 @@
               entry.classList.add("search-result");
               entry.innerHTML = `${x.d} (${x.u})`;
               entry.onclick = () => {
-                urlParams.set("id", searchInput.value);
+                urlParams.set("id", x.u);
                 window.history.pushState({}, "", "?" + urlParams.toString());
                 showPlayer(x.d);
               };
@@ -468,8 +497,9 @@
     }, 300);
   }
 
-  async function showPlayer(username) {
-    searchInput.value = username;
+  async function showPlayer(userId) {
+    document.getElementById("player-name").innerHTML = userId;
+    searchInput.value = userId;
     ["hunter-summary", "stats-summary"].forEach((x) => {
       setTimeout(() => {
         document
@@ -477,16 +507,20 @@
           .classList.remove("appear");
       }, 1);
     });
-    document.getElementById(
-      "player-name"
-    ).innerHTML = `${username.toUpperCase()}`;
     document.getElementById("player-info").style.display = "none";
     document.getElementById("elluna-cry").setAttribute("hidden", "");
     const spinner = document.getElementById("spinner");
     spinner.removeAttribute("hidden");
+    document.getElementById("player-name").innerHTML = await fetch(
+      "https://supervive.io/api/search?query=" + userId
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        return result[0].d;
+      });
     document.getElementById("player-page-info").setAttribute("hidden", "");
     let result = await fetch(
-      `https://supervive.io/api/player/${username}.json?sort=gamesPlayed&order=desc`
+      `https://supervive.io/api/player/${userId}.json?sort=gamesPlayed&order=desc`
     )
       .then((res) => res.json())
       .then((res) => {
@@ -531,6 +565,7 @@
           x.checked = true;
           return;
         }
+        localStorage.setItem("hunterStats" + e.target.name, e.target.checked);
         generateTopHunters(stats);
       });
     });
@@ -548,7 +583,7 @@
           x.checked = true;
           return;
         }
-
+        localStorage.setItem("summaryStats" + e.target.name, e.target.checked);
         generateOverview(aggregate);
       });
     });
@@ -588,7 +623,6 @@
     let filtersArr = Object.keys(result[0]);
     let filtersInsert = filtersArr.splice(cutoff, filtersArr.length - cutoff);
     filtersArr.splice(4, 0, ...filtersInsert);
-
     // entries
     generateEntries(queuesArr, huntersArr, filtersArr);
 
@@ -630,12 +664,52 @@
       }
       stat.title = filters[index] || "";
       switch (filters[index]) {
+        case "winrate":
+          if (x) stat.innerHTML += "%";
+          break;
+        case "top-4 rate":
+          if (x) stat.innerHTML += "%";
+          break;
         case "timePlayedSeconds":
           stat.innerHTML = `${Math.round((10 * x) / 60 ** 2) / 10} hours`;
           stat.title = `${Math.round(x / 60 ** 2)} hours and ${
             Math.round(10 * ((x % 60 ** 2) / 60)) / 10
           } minutes`;
+          if (entry[0] === "Deathmatch") {
+            stat.classList.add("dm-time-warning");
+            stat.title += "\nDeathmatch times are not accurate!";
+          }
           // TODO Check if filters[0] is deathmatch, if so add css class to show ! with title
+          break;
+        case "placementsJson":
+          stat.innerHTML = "";
+          let but = document.createElement("div");
+          but.classList.add("placements-button");
+          but.innerText = "Show Placements";
+          stat.style.position = "relative";
+          stat.style.overflowX = "visible";
+          let listEl = document.createElement("div");
+          listEl.classList.add("flex-col", "placements-list");
+          listEl.setAttribute("hidden", "");
+          stat.append(but);
+          if (!x) break;
+          but.addEventListener("click", (e) => {
+            hideAllPlacementLists();
+            listEl.removeAttribute("hidden");
+          });
+          let placements = JSON.parse(x);
+          for (let i = 0; i < 10; i++) {
+            let placementEl = document.createElement("div");
+            placementEl.classList.add("placement");
+            placementEl.innerHTML = `<span>${i + 1}:</span><span>${
+              placements[i] ? placements[i] : 0
+            }</span>`;
+            listEl.append(placementEl);
+          }
+          stat.append(listEl);
+          break;
+        case "queue":
+          stat.style.overflowX = "visible";
           break;
         default:
           break;
@@ -645,11 +719,19 @@
     parentElement.append(el);
   }
 
+  function hideAllPlacementLists() {
+    Array.from(document.querySelectorAll(".placements-list")).forEach((x) => {
+      x.setAttribute("hidden", "");
+    });
+  }
+
   function addFilterEntry(
     entry,
     element = document.getElementById("hunter-entries"),
     bgColor = true,
-    arrays = { queues: [], hunters: [], filter: [] }
+    arrays = { queues: [], hunters: [], filters: [] },
+    sort = "gamesPlayed",
+    order = "desc"
   ) {
     element.innerHTML = "";
     let el = document.createElement("div");
@@ -658,9 +740,9 @@
     entry.forEach((x) => {
       let wrapper = document.createElement("div");
       wrapper.setAttribute("data-sort", "");
+      if (x === sort) wrapper.setAttribute("data-sort", order);
       let stat = document.createElement("span");
       stat.setAttribute("data-sort-key", x);
-      if (typeof x === "object") x = JSON.stringify(x);
       switch (x) {
         case "gamesPlayed":
           stat.innerHTML = "Games";
@@ -681,25 +763,23 @@
       }
       wrapper.title = stat.innerHTML;
       wrapper.onclick = (e) => {
-        Array.from(document.querySelectorAll("[data-sort]")).forEach(
-          (sortEl) => {
-            if (sortEl !== e.target.parentElement)
-              sortEl.setAttribute("data-sort", "");
-          }
-        );
         let sortIdx = arrays.filters.findIndex(
-          (x) => x === e.target.dataset.sortKey
+          (x) => x === stat.dataset.sortKey
         );
-        if (e.target.parentElement.dataset.sort !== "desc") {
-          e.target.parentElement.dataset.sort = "desc";
+        if (wrapper.dataset.sort !== "desc") {
           arrays.queues.sort((a, b) => b[sortIdx] - a[sortIdx]);
           arrays.hunters.sort((a, b) => b[sortIdx] - a[sortIdx]);
         } else {
-          e.target.parentElement.dataset.sort = "asc";
           arrays.queues.sort((a, b) => a[sortIdx] - b[sortIdx]);
           arrays.hunters.sort((a, b) => a[sortIdx] - b[sortIdx]);
         }
-        generateEntries(arrays.queues, arrays.hunters);
+        generateEntries(
+          arrays.queues,
+          arrays.hunters,
+          arrays.filters,
+          x,
+          wrapper.dataset.sort !== "desc" ? "desc" : "asc"
+        );
       };
       wrapper.append(stat);
       el.append(wrapper);
@@ -819,8 +899,8 @@
     document.getElementById("summary-content").innerHTML = `
     <div class="data-group-total">
       <div>
-        <div><b>${totalWins} Wins</b> (Total)</div>
-        <div><b>${totalGames} Games</b> (Total)</div>
+        <div><b>${totalWins} Wins</b> (${queueArr.toString()})</div>
+        <div><b>${totalGames} Games</b> (${queueArr.toString()})</div>
       </div>
      ${
        getProgressCircleHTML("Winrate", totalWins / totalGames, 0.2, 700)
@@ -830,8 +910,8 @@
     </div>
     <div class="data-group-total">
       <div>
-        <div><b>${totalKills} Kills</b> (Total)</div>
-        <div><b>${totalDeaths} Deaths</b> (Total)</div>
+        <div><b>${totalKills} Kills</b> (${queueArr.toString()})</div>
+        <div><b>${totalDeaths} Deaths</b> (${queueArr.toString()})</div>
       </div>
       <div title="${Math.floor((totalKills / totalDeaths) * 100000) / 100000}">
         <div class="flex-col">
@@ -842,20 +922,32 @@
     </div>
     <div title="${Math.floor(totalTimePlayed / 60 / 60 / 24)} days ${Math.floor(
       (totalTimePlayed / 60 / 60) % 24
-    )} hours ${Math.floor((totalTimePlayed / 60) % 60)} minutes">
-    <b>${Math.round(totalTimePlayed / 60 / 60)} Hours playtime</b> (Total)
+    )} hours ${Math.floor((totalTimePlayed / 60) % 60)} minutes${
+      queueArr.some((x) => x === "dm")
+        ? "\nDeathmatch times are not accurate!"
+        : ""
+    }">
+    <b>${Math.round(totalTimePlayed / 60 / 60)} Hours playtime</b><span ${
+      queueArr.some((x) => x === "dm") ? "class='dm-time-warning'" : ""
+    }>(${queueArr.toString()})</span>
     </div>
     `;
   }
 
-  function generateEntries(queues, hunters, filters) {
+  function generateEntries(queues, hunters, filters, sort, order = "desc") {
     // filters first
-    addFilterEntry(filters, document.getElementById("stat-filters"), false, {
-      queues: queues,
-      hunters: hunters,
-      filters: filters,
-    });
-
+    addFilterEntry(
+      filters,
+      document.getElementById("stat-filters"),
+      false,
+      {
+        queues: queues,
+        hunters: hunters,
+        filters: filters,
+      },
+      sort,
+      order
+    );
     // add Top 4 and winrate
     let bgCount = 0;
     // add queues and hunters here as param for onclick sort
@@ -880,6 +972,7 @@
       aggregate[queue] = {};
       obj.forEach((entry) => {
         Object.entries(entry).forEach(([key, value]) => {
+          if (key === "queue" && value === "") return;
           aggregate[queue][key]
             ? (aggregate[queue][key] += value || 0)
             : (aggregate[queue][key] = value || 0);
@@ -887,6 +980,9 @@
             aggregate[queue][key] = "";
           if (key === "queue" && value !== "") {
             aggregate[queue][key] = value;
+          }
+          if (key === "placementsJson") {
+            // console.log(value);
           }
         });
       });
